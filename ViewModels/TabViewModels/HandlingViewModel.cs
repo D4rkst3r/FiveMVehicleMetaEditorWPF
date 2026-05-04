@@ -32,7 +32,12 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
         public HandlingData? SelectedHandling
         {
             get => _selectedHandling;
-            set { _selectedHandling = value; OnPropertyChanged(); }
+            set
+            {
+                _selectedHandling = value;
+                // Notify ALL properties so UI refreshes all values for newly selected entry
+                OnPropertyChanged(string.Empty);
+            }
         }
 
         // Search text for filtering
