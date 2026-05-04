@@ -8,7 +8,7 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
     {
         private int _backupCount = 0;
         private int _presetCount = 0;
-        private string _appVersion = "v1.0";
+        private string _appVersion = "v1.0.2";
 
         public int BackupCount
         {

@@ -25,6 +25,12 @@ A powerful WPF-based editor for GTA V FiveM vehicle metadata files (`vehicles.me
 |----------|---------|--------|
 | ![Settings](assets/screenshots/settings.png) | ![Browser](assets/screenshots/browser.png) | ![Merger](assets/screenshots/merger.png) |
 
+## [1.0.1] - 2026-05-04
+### Fixed
+- ValidatorViewModel Load/Export implementiert
+- All placeholder strings entfernt
+## [1.0.0] - 2026-05-04
+
 ## Features
 
 ✨ **12 Specialized Tabs:**

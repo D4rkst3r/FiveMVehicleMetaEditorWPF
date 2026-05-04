@@ -79,7 +79,7 @@ namespace FiveMVehicleMetaEditorWPF.Core.Services
                 EnableKeyboardShortcuts = true,
 
                 // Version
-                AppVersion = "1.0.0"
+                AppVersion = "1.0.2"
             };
         }
     }
