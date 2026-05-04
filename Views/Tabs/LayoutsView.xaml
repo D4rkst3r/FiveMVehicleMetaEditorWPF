@@ -26,11 +26,17 @@
 
         <!-- Left: Layouts List -->
         <Border Grid.Row="1" Grid.Column="0" Background="{DynamicResource SecondaryBgBrush}" Margin="5">
-            <StackPanel>
-                <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBox Grid.Row="0"
+                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                          Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
                          Padding="8" Margin="5" Height="30"/>
-                <ListBox ItemsSource="{Binding Layouts}"
+                <ListBox Grid.Row="1"
+                         ItemsSource="{Binding Layouts}"
                          SelectedItem="{Binding SelectedLayout}"
                          Background="{DynamicResource DarkBgBrush}"
                          Foreground="{DynamicResource LightTextBrush}"
@@ -44,7 +50,7 @@
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
-            </StackPanel>
+            </Grid>
         </Border>
 
         <!-- Right: Layout Editor -->

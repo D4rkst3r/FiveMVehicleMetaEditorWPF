@@ -29,19 +29,23 @@
 
         <!-- Left: Vehicle List -->
         <Border Grid.Row="1" Grid.Column="0" Background="{DynamicResource SecondaryBgBrush}" Margin="5">
-            <StackPanel>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
                 <!-- Search -->
-                <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                <TextBox Grid.Row="0"
+                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                          Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
                          Padding="8" Margin="5" Height="30"/>
                 <!-- Vehicle List -->
-                <ListBox ItemsSource="{Binding FilteredVehicles}"
+                <ListBox Grid.Row="1"
+                         ItemsSource="{Binding FilteredVehicles}"
                          SelectedItem="{Binding SelectedVehicle}"
                          Background="{DynamicResource DarkBgBrush}"
                          Foreground="{DynamicResource LightTextBrush}"
-                         ScrollViewer.VerticalScrollBarVisibility="Auto"
-                         Height="Auto"
-                         MinHeight="200">
+                         ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel>
@@ -51,7 +55,7 @@
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
-            </StackPanel>
+            </Grid>
         </Border>
 
         <!-- Right: Vehicle Properties -->
