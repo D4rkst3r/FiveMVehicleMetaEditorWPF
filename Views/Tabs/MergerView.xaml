@@ -48,13 +48,10 @@
                              ScrollViewer.VerticalScrollBarVisibility="Auto">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel>
-                                    <TextBlock Text="{Binding Converter={StaticResource FileNameConverter}}"
-                                               FontWeight="Bold" Foreground="{DynamicResource LightTextBrush}"/>
-                                    <TextBlock Text="{Binding}" FontSize="9"
-                                               Foreground="{DynamicResource GrayTextBrush}"
-                                               TextTrimming="CharacterEllipsis"/>
-                                </StackPanel>
+                                <TextBlock Text="{Binding}"
+                                           Foreground="{DynamicResource LightTextBrush}"
+                                           TextTrimming="CharacterEllipsis"
+                                           ToolTip="{Binding}"/>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>
