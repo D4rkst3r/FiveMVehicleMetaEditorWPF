@@ -18,6 +18,7 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
     {
         private readonly MetaLayoutsService _layoutsService = new();
         private string _currentFilePath = "";
+        private List<LayoutData> _allLayouts = new(); // master list for search
 
         // Observable collection of layout entries
         private ObservableCollection<LayoutData> _layouts = new();
@@ -184,6 +185,7 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
 
                 if (success && layouts != null)
                 {
+                    _allLayouts = layouts; // store master list
                     Layouts.Clear();
                     foreach (var layout in layouts)
                         Layouts.Add(layout);
@@ -288,9 +290,7 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
 
         private void OnSearchChanged()
         {
-            var allLayouts = Layouts.ToList();
-            var filtered = _layoutsService.FilterLayouts(allLayouts, SearchText);
-
+            var filtered = _layoutsService.FilterLayouts(_allLayouts, SearchText);
             Layouts.Clear();
             foreach (var item in filtered)
                 Layouts.Add(item);

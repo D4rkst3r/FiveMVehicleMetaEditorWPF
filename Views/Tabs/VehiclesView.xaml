@@ -65,21 +65,68 @@
                     <TextBlock Text="Vehicle Properties" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}"/>
 
                     <StackPanel Visibility="{Binding SelectedVehicle, Converter={StaticResource BoolToVisConverter}}">
-                        <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
-                            <TextBlock Text="Model:" Foreground="{DynamicResource LightTextBrush}"/>
-                            <TextBlock Grid.Column="1" Text="{Binding SelectedVehicle.ModelName}" FontWeight="Bold" Foreground="{DynamicResource LightTextBrush}"/>
+                        <Grid Margin="0,0,0,5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="1" Text="Make:" Foreground="{DynamicResource LightTextBrush}"/>
-                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedVehicle.VehicleMakeName}" FontWeight="Bold" Foreground="{DynamicResource LightTextBrush}"/>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Model:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
+                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedVehicle.ModelName, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"/>
 
-                            <TextBlock Grid.Row="2" Text="Class:" Foreground="{DynamicResource LightTextBrush}"/>
-                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelectedVehicle.VehicleClass}" FontWeight="Bold" Foreground="{DynamicResource LightTextBrush}"/>
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Make:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SelectedVehicle.VehicleMakeName, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"/>
 
-                            <TextBlock Grid.Row="3" Text="Type:" Foreground="{DynamicResource LightTextBrush}"/>
-                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SelectedVehicle.VehicleType}" FontWeight="Bold" Foreground="{DynamicResource LightTextBrush}"/>
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Class:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding SelectedVehicle.VehicleClass, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"/>
 
-                            <TextBlock Grid.Row="4" Text="Seats:" Foreground="{DynamicResource LightTextBrush}"/>
-                            <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding SelectedVehicle.Seats}" FontWeight="Bold" Foreground="{DynamicResource LightTextBrush}"/>
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Type:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
+                            <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding SelectedVehicle.VehicleType, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"/>
+
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Seats:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
+                            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding SelectedVehicle.Seats, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"/>
+
+                            <TextBlock Grid.Row="5" Grid.Column="0" Text="Handling ID:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
+                            <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding SelectedVehicle.HandlingId, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"/>
+
+                            <TextBlock Grid.Row="6" Grid.Column="0" Text="Game Name:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
+                            <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding SelectedVehicle.GameName, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"/>
+
+                            <TextBlock Grid.Row="7" Grid.Column="0" Text="Vehicle Type:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
+                            <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding SelectedVehicle.VehicleType, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"/>
+
+                            <TextBlock Grid.Row="8" Grid.Column="0" Text="Layout:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
+                            <TextBox Grid.Row="8" Grid.Column="1" Text="{Binding SelectedVehicle.Layout}"
+                                     IsReadOnly="True"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"/>
                         </Grid>
 
                         <Separator Margin="0,10"/>

@@ -82,23 +82,14 @@
 
                         <TextBlock Grid.Row="7" Grid.Column="0" Text="Vehicle Class:"
                                    Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,0,8"/>
-                        <ComboBox Grid.Row="7" Grid.Column="1"
-                                  Text="{Binding VehicleClass}"
-                                  IsEditable="True"
-                                  Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
-                                  Margin="0,0,0,8">
-                            <ComboBoxItem Content="VC_SEDAN"/>
-                            <ComboBoxItem Content="VC_SPORTS"/>
-                            <ComboBoxItem Content="VC_SUPER"/>
-                            <ComboBoxItem Content="VC_MUSCLE"/>
-                            <ComboBoxItem Content="VC_SUV"/>
-                            <ComboBoxItem Content="VC_OFF_ROAD"/>
-                            <ComboBoxItem Content="VC_VAN"/>
-                            <ComboBoxItem Content="VC_TRUCK"/>
-                            <ComboBoxItem Content="VC_MOTORCYCLE"/>
-                            <ComboBoxItem Content="VC_MILITARY"/>
-                            <ComboBoxItem Content="VC_EMERGENCY"/>
-                        </ComboBox>
+                        <StackPanel Grid.Row="7" Grid.Column="1" Margin="0,0,0,8">
+                            <TextBox Text="{Binding VehicleClass, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="8,5"/>
+                            <TextBlock Text="Examples: VC_SEDAN, VC_SUV, VC_SPORTS, VC_SUPER, VC_MUSCLE, VC_TRUCK, VC_MOTORCYCLE, VC_MILITARY, VC_EMERGENCY"
+                                       TextWrapping="Wrap"
+                                       Foreground="{DynamicResource GrayTextBrush}" FontSize="10" Margin="0,3,0,0"/>
+                        </StackPanel>
                     </Grid>
                 </Border>
 

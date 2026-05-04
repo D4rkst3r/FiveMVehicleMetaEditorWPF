@@ -80,19 +80,31 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
 
         private void UpdateStats()
         {
-            // Count backups
+            // Count backups — check both local and AppData locations
             try
             {
-                if (Directory.Exists(".backups"))
-                    BackupCount = Directory.GetFiles(".backups", "*.bak").Length;
+                int count = 0;
+                var backupPath1 = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ".backups");
+                var backupPath2 = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FiveMVehicleMetaEditor", "backups");
+                if (Directory.Exists(backupPath1))
+                    count += Directory.GetFiles(backupPath1, "*.bak").Length;
+                if (Directory.Exists(backupPath2))
+                    count += Directory.GetFiles(backupPath2, "*.bak").Length;
+                BackupCount = count;
             }
             catch { }
 
-            // Count presets
+            // Count presets — check both local and AppData locations
             try
             {
-                if (Directory.Exists("custom_presets"))
-                    PresetCount = Directory.GetFiles("custom_presets", "*.json").Length;
+                int count = 0;
+                var presetPath1 = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "custom_presets");
+                var presetPath2 = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FiveMVehicleMetaEditor", "presets");
+                if (Directory.Exists(presetPath1))
+                    count += Directory.GetFiles(presetPath1, "*.json").Length;
+                if (Directory.Exists(presetPath2))
+                    count += Directory.GetFiles(presetPath2, "*.json").Length;
+                PresetCount = count;
             }
             catch { }
         }

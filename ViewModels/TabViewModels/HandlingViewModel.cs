@@ -18,6 +18,7 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
     {
         private readonly MetaHandlingService _handlingService = new();
         private string _currentFilePath = "";
+        private List<HandlingData> _allHandlingEntries = new(); // master list for search
 
         // Observable collection of handling entries
         private ObservableCollection<HandlingData> _handlingEntries = new();
@@ -223,6 +224,7 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
 
                 if (success && handlingEntries != null)
                 {
+                    _allHandlingEntries = handlingEntries; // store master list
                     HandlingEntries.Clear();
                     foreach (var entry in handlingEntries)
                         HandlingEntries.Add(entry);
@@ -327,10 +329,7 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
 
         private void OnSearchChanged()
         {
-            // Filter handling entries based on search text
-            var allHandling = HandlingEntries.ToList();
-            var filtered = _handlingService.FilterHandling(allHandling, SearchText);
-
+            var filtered = _handlingService.FilterHandling(_allHandlingEntries, SearchText);
             HandlingEntries.Clear();
             foreach (var item in filtered)
                 HandlingEntries.Add(item);
