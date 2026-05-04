@@ -1,6 +1,29 @@
-# FiveM Vehicle Meta Editor
+<div align="center">
+  <img src="logog.png" alt="FiveM Vehicle Meta Editor Logo" width="120" height="120">
+  <h1>FiveM Vehicle Meta Editor</h1>
+  <p><strong>A powerful WPF-based editor for GTA V FiveM vehicle metadata files</strong></p>
+  <p>
+    <a href="https://github.com/D4rkst3r/FiveMVehicleMetaEditor/releases">📥 Download</a> •
+    <a href="#features">✨ Features</a> •
+    <a href="#installation">⚡ Install</a> •
+    <a href="#usage">📖 Guide</a> •
+    <a href="#license">📄 License</a>
+  </p>
+</div>
+
+---
 
 A powerful WPF-based editor for GTA V FiveM vehicle metadata files (`vehicles.meta`, `handling.meta`, `carvariations.meta`, etc.).
+
+## 🖼️ Screenshots
+
+| Dashboard | Vehicles Editor | Handling Parameters |
+|-----------|-----------------|-------------------|
+| ![Dashboard](assets/screenshots/dashboard.png) | ![Vehicles](assets/screenshots/vehicles.png) | ![Handling](assets/screenshots/handling.png) |
+
+| Settings | Browser | Merger |
+|----------|---------|--------|
+| ![Settings](assets/screenshots/settings.png) | ![Browser](assets/screenshots/browser.png) | ![Merger](assets/screenshots/merger.png) |
 
 ## Features
 

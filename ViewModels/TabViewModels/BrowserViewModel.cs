@@ -1,6 +1,8 @@
+using System;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using FiveMVehicleMetaEditorWPF.Core;
+using FiveMVehicleMetaEditorWPF.Core.Services;
 
 namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
 {
@@ -67,20 +69,113 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
 
         private void OnLoadVehicles()
         {
-            ShowInfo("Load vehicles.meta...");
-            // TODO: Implement file dialog and loading
+            try
+            {
+                var filePath = FileService.OpenFileDialog("vehicles");
+                if (filePath == null) return;
+
+                ShowInfo("Loading vehicles.meta...");
+                IsLoading = true;
+
+                var service = new MetaVehiclesService();
+                var (success, vehicles, error) = service.LoadVehiclesMeta(filePath);
+
+                if (success && vehicles != null)
+                {
+                    Vehicles.Clear();
+                    foreach (var v in vehicles)
+                        Vehicles.Add(v.ModelName);
+
+                    VehicleCount = vehicles.Count;
+                    SelectedFile = filePath;
+                    ShowSuccess($"Loaded {vehicles.Count} vehicles");
+                }
+                else
+                {
+                    ShowError(error ?? "Failed to load vehicles.meta");
+                    FileService.ShowError("Load Error", error ?? "Unknown error");
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Error: {ex.Message}");
+                FileService.ShowError("Error", ex.Message);
+            }
+            finally
+            {
+                IsLoading = false;
+            }
         }
 
         private void OnLoadHandling()
         {
-            ShowInfo("Load handling.meta...");
-            // TODO: Implement file dialog and loading
+            try
+            {
+                var filePath = FileService.OpenFileDialog("handling");
+                if (filePath == null) return;
+
+                ShowInfo("Loading handling.meta...");
+                IsLoading = true;
+
+                var service = new MetaHandlingService();
+                var (success, handlingData, error) = service.LoadHandlingMeta(filePath);
+
+                if (success && handlingData != null)
+                {
+                    ShowSuccess($"Loaded {handlingData.Count} handling entries");
+                    SelectedFile = filePath;
+                }
+                else
+                {
+                    ShowError(error ?? "Failed to load handling.meta");
+                    FileService.ShowError("Load Error", error ?? "Unknown error");
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Error: {ex.Message}");
+                FileService.ShowError("Error", ex.Message);
+            }
+            finally
+            {
+                IsLoading = false;
+            }
         }
 
         private void OnLoadLayouts()
         {
-            ShowInfo("Load vehiclelayouts.meta...");
-            // TODO: Implement file dialog and loading
+            try
+            {
+                var filePath = FileService.OpenFileDialog("layouts");
+                if (filePath == null) return;
+
+                ShowInfo("Loading vehiclelayouts.meta...");
+                IsLoading = true;
+
+                var service = new MetaLayoutsService();
+                var (success, layouts, error) = service.LoadLayoutsMeta(filePath);
+
+                if (success && layouts != null)
+                {
+                    LayoutCount = layouts.Count;
+                    SelectedFile = filePath;
+                    ShowSuccess($"Loaded {layouts.Count} layouts");
+                }
+                else
+                {
+                    ShowError(error ?? "Failed to load vehiclelayouts.meta");
+                    FileService.ShowError("Load Error", error ?? "Unknown error");
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowError($"Error: {ex.Message}");
+                FileService.ShowError("Error", ex.Message);
+            }
+            finally
+            {
+                IsLoading = false;
+            }
         }
     }
 }

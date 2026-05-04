@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Windows.Input;
 using FiveMVehicleMetaEditorWPF.Core;
 using FiveMVehicleMetaEditorWPF.Core.Models;
 using FiveMVehicleMetaEditorWPF.Core.Services;
+using Newtonsoft.Json.Linq;
 
 namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
 {
@@ -206,14 +208,39 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
         {
             try
             {
-                ShowInfo("Select a handling.meta file to load...");
-                // TODO: Implement file dialog
-                // For now, just show placeholder
-                ShowSuccess("Load handling.meta (placeholder)");
+                var filePath = FileService.OpenFileDialog("handling");
+                if (filePath == null) return;
+
+                ShowInfo("Loading handling.meta...");
+                IsLoading = true;
+
+                var (success, handlingEntries, error) = _handlingService.LoadHandlingMeta(filePath);
+
+                if (success && handlingEntries != null)
+                {
+                    HandlingEntries.Clear();
+                    foreach (var entry in handlingEntries)
+                        HandlingEntries.Add(entry);
+
+                    OnSearchChanged(); // Apply current filter
+                    _currentFilePath = filePath;
+
+                    ShowSuccess($"Loaded {handlingEntries.Count} handling entries from {Path.GetFileName(filePath)}");
+                }
+                else
+                {
+                    ShowError(error ?? "Failed to load handling.meta");
+                    FileService.ShowError("Load Error", error ?? "Unknown error");
+                }
             }
             catch (Exception ex)
             {
                 ShowError($"Error loading file: {ex.Message}");
+                FileService.ShowError("Load Error", ex.Message);
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
 
@@ -221,21 +248,42 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
         {
             try
             {
-                if (string.IsNullOrEmpty(_currentFilePath))
+                if (HandlingEntries.Count == 0)
                 {
-                    ShowError("No file loaded");
+                    ShowError("No handling entries to save");
                     return;
                 }
 
-                var (success, error) = _handlingService.SaveHandlingMeta(_currentFilePath, HandlingEntries.ToList());
+                var filePath = string.IsNullOrEmpty(_currentFilePath)
+                    ? FileService.SaveFileDialog("handling", "handling.meta")
+                    : _currentFilePath;
+
+                if (filePath == null) return;
+
+                ShowInfo("Saving handling.meta...");
+                IsLoading = true;
+
+                var (success, error) = _handlingService.SaveHandlingMeta(filePath, HandlingEntries.ToList());
+
                 if (success)
-                    ShowSuccess("Handling data saved successfully");
+                {
+                    _currentFilePath = filePath;
+                    ShowSuccess($"Saved {HandlingEntries.Count} handling entries to {Path.GetFileName(filePath)}");
+                }
                 else
+                {
                     ShowError($"Error saving: {error}");
+                    FileService.ShowError("Save Error", error ?? "Unknown error");
+                }
             }
             catch (Exception ex)
             {
                 ShowError($"Error saving file: {ex.Message}");
+                FileService.ShowError("Save Error", ex.Message);
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
 
@@ -243,13 +291,32 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
         {
             try
             {
-                ShowInfo("Select location to export handling data...");
-                // TODO: Implement export functionality (JSON, CSV, etc.)
-                ShowSuccess("Export handling data (placeholder)");
+                if (HandlingEntries.Count == 0)
+                {
+                    ShowError("No handling entries to export");
+                    return;
+                }
+
+                var filePath = FileService.SaveFileDialog("json", "handling_export.json");
+                if (filePath == null) return;
+
+                ShowInfo("Exporting handling data to JSON...");
+                IsLoading = true;
+
+                var handlingList = new List<HandlingData>(HandlingEntries);
+                var jsonData = JObject.FromObject(new { handlingEntries = handlingList });
+
+                File.WriteAllText(filePath, jsonData.ToString());
+                ShowSuccess($"Exported {HandlingEntries.Count} handling entries to {Path.GetFileName(filePath)}");
             }
             catch (Exception ex)
             {
                 ShowError($"Error exporting: {ex.Message}");
+                FileService.ShowError("Export Error", ex.Message);
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
 

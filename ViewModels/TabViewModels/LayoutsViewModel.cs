@@ -1,10 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Windows.Input;
 using FiveMVehicleMetaEditorWPF.Core;
 using FiveMVehicleMetaEditorWPF.Core.Models;
 using FiveMVehicleMetaEditorWPF.Core.Services;
+using Newtonsoft.Json.Linq;
 
 namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
 {
@@ -111,13 +114,39 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
         {
             try
             {
-                ShowInfo("Select a vehiclelayouts.meta file to load...");
-                // TODO: Implement file dialog
-                ShowSuccess("Load vehiclelayouts.meta (placeholder)");
+                var filePath = FileService.OpenFileDialog("layouts");
+                if (filePath == null) return;
+
+                ShowInfo("Loading vehiclelayouts.meta...");
+                IsLoading = true;
+
+                var (success, layouts, error) = _layoutsService.LoadLayoutsMeta(filePath);
+
+                if (success && layouts != null)
+                {
+                    Layouts.Clear();
+                    foreach (var layout in layouts)
+                        Layouts.Add(layout);
+
+                    OnSearchChanged(); // Apply current filter
+                    _currentFilePath = filePath;
+
+                    ShowSuccess($"Loaded {layouts.Count} layouts from {Path.GetFileName(filePath)}");
+                }
+                else
+                {
+                    ShowError(error ?? "Failed to load vehiclelayouts.meta");
+                    FileService.ShowError("Load Error", error ?? "Unknown error");
+                }
             }
             catch (Exception ex)
             {
                 ShowError($"Error loading file: {ex.Message}");
+                FileService.ShowError("Load Error", ex.Message);
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
 
@@ -125,21 +154,42 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
         {
             try
             {
-                if (string.IsNullOrEmpty(_currentFilePath))
+                if (Layouts.Count == 0)
                 {
-                    ShowError("No file loaded");
+                    ShowError("No layouts to save");
                     return;
                 }
 
-                var (success, error) = _layoutsService.SaveLayoutsMeta(_currentFilePath, Layouts.ToList());
+                var filePath = string.IsNullOrEmpty(_currentFilePath)
+                    ? FileService.SaveFileDialog("layouts", "vehiclelayouts.meta")
+                    : _currentFilePath;
+
+                if (filePath == null) return;
+
+                ShowInfo("Saving vehiclelayouts.meta...");
+                IsLoading = true;
+
+                var (success, error) = _layoutsService.SaveLayoutsMeta(filePath, Layouts.ToList());
+
                 if (success)
-                    ShowSuccess("Layout data saved successfully");
+                {
+                    _currentFilePath = filePath;
+                    ShowSuccess($"Saved {Layouts.Count} layouts to {Path.GetFileName(filePath)}");
+                }
                 else
+                {
                     ShowError($"Error saving: {error}");
+                    FileService.ShowError("Save Error", error ?? "Unknown error");
+                }
             }
             catch (Exception ex)
             {
                 ShowError($"Error saving file: {ex.Message}");
+                FileService.ShowError("Save Error", ex.Message);
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
 
@@ -147,13 +197,32 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
         {
             try
             {
-                ShowInfo("Select location to export layout data...");
-                // TODO: Implement export functionality
-                ShowSuccess("Export layout data (placeholder)");
+                if (Layouts.Count == 0)
+                {
+                    ShowError("No layouts to export");
+                    return;
+                }
+
+                var filePath = FileService.SaveFileDialog("json", "layouts_export.json");
+                if (filePath == null) return;
+
+                ShowInfo("Exporting layouts to JSON...");
+                IsLoading = true;
+
+                var layoutList = new List<LayoutData>(Layouts);
+                var jsonData = JObject.FromObject(new { layouts = layoutList });
+
+                File.WriteAllText(filePath, jsonData.ToString());
+                ShowSuccess($"Exported {Layouts.Count} layouts to {Path.GetFileName(filePath)}");
             }
             catch (Exception ex)
             {
                 ShowError($"Error exporting: {ex.Message}");
+                FileService.ShowError("Export Error", ex.Message);
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
 
