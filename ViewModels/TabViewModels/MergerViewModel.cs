@@ -10,7 +10,7 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
         public ICommand SaveCommand { get; }
         public ICommand ExportCommand { get; }
 
-        public MergerViewModel()
+        public MergerViewModel(MainWindowViewModel? mainVM = null) : base(mainVM)
         {
             LoadCommand = new RelayCommand(() => ShowSuccess("Load files to merge"));
             SaveCommand = new RelayCommand(() => ShowSuccess("Save merged result"));

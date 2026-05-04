@@ -10,7 +10,7 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
         public ICommand SaveCommand { get; }
         public ICommand ExportCommand { get; }
 
-        public SplitterViewModel()
+        public SplitterViewModel(MainWindowViewModel? mainVM = null) : base(mainVM)
         {
             LoadCommand = new RelayCommand(() => ShowSuccess("Load file to split"));
             SaveCommand = new RelayCommand(() => ShowSuccess("Save split files"));

@@ -18,7 +18,7 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
         public ICommand SaveCommand { get; }
         public ICommand ExportCommand { get; }
 
-        public CarvariationsViewModel()
+        public CarvariationsViewModel(MainWindowViewModel? mainVM = null) : base(mainVM)
         {
             LoadCommand = new RelayCommand(() => ShowSuccess("Load carvariations.meta"));
             SaveCommand = new RelayCommand(() => ShowSuccess("Save carvariations.meta"));

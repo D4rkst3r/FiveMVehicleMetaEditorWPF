@@ -197,7 +197,7 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
         public ICommand SaveCommand { get; }
         public ICommand ExportCommand { get; }
 
-        public HandlingViewModel()
+        public HandlingViewModel(MainWindowViewModel? mainVM = null) : base(mainVM)
         {
             LoadCommand = new RelayCommand(ExecuteLoad);
             SaveCommand = new RelayCommand(ExecuteSave);

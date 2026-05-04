@@ -10,7 +10,7 @@ using WinForms = System.Windows.Forms;
 
 namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
 {
-    public class SettingsViewModel : INotifyPropertyChanged
+    public class SettingsViewModel : BaseTabViewModel
     {
         private readonly SettingsManager _settingsManager;
         private bool _darkMode;
@@ -33,7 +33,7 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
         public ICommand BrowseDefaultDirectoryCommand { get; }
         public ICommand BrowseBackupLocationCommand { get; }
 
-        public SettingsViewModel()
+        public SettingsViewModel(MainWindowViewModel? mainVM = null) : base(mainVM)
         {
             _settingsManager = new SettingsManager();
             LoadSettingsFromManager();
@@ -120,11 +120,9 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
         public bool EnableKeyboardShortcuts { get => _enableKeyboardShortcuts; set { if (_enableKeyboardShortcuts != value) { _enableKeyboardShortcuts = value; OnPropertyChanged(); } } }
         public string AppVersion { get => _appVersion; set { if (_appVersion != value) { _appVersion = value; OnPropertyChanged(); } } }
 
-        public event PropertyChangedEventHandler? PropertyChanged;
-
-        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        protected override void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            base.OnPropertyChanged(propertyName);
 
             // Notify global settings service of live changes (but not during initial load)
             if (!_isLoading && propertyName != null)

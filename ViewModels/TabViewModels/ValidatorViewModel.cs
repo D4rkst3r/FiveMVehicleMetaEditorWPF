@@ -32,7 +32,7 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
         public ICommand ValidateCommand { get; }
         public ICommand ExportCommand { get; }
 
-        public ValidatorViewModel()
+        public ValidatorViewModel(MainWindowViewModel? mainVM = null) : base(mainVM)
         {
             LoadCommand = new RelayCommand(ExecuteLoad);
             ValidateCommand = new RelayCommand(ExecuteValidate);
