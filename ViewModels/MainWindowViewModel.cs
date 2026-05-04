@@ -125,6 +125,14 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels
         }
 
         /// <summary>
+        /// Navigate to a tab by its ID (e.g. "vehicles", "handling", "layouts")
+        /// </summary>
+        public void NavigateTo(string tabId)
+        {
+            CurrentTab = tabId;
+        }
+
+        /// <summary>
         /// Handle live settings changes from the global AppSettingsService
         /// </summary>
         private void OnSettingChanged(object? sender, SettingChangedEventArgs e)

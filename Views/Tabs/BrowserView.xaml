@@ -6,59 +6,181 @@
              mc:Ignorable="d">
     <ScrollViewer>
         <StackPanel Margin="20">
-            <!-- Title -->
-            <TextBlock Text="📋 Data Browser" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}"/>
+
+            <!-- Header -->
+            <TextBlock Text="📋 Data Browser"
+                       FontSize="24" FontWeight="Bold"
+                       Foreground="{DynamicResource PrimaryBrush}"
+                       Margin="0,0,0,4"/>
+            <TextBlock Text="Load, inspect and navigate your FiveM meta files"
+                       FontSize="12"
+                       Foreground="{DynamicResource LightTextBrush}"
+                       Margin="0,0,0,20"/>
 
             <!-- File Operations -->
-            <Border Background="{DynamicResource SecondaryBgBrush}" CornerRadius="4" Padding="15" Margin="0,0,0,15">
+            <Border Background="{DynamicResource SecondaryBgBrush}" CornerRadius="4" Padding="15" Margin="0,0,0,12">
                 <StackPanel>
-                    <TextBlock Text="📂 File Operations" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,10"/>
+                    <TextBlock Text="📂 File Operations"
+                               FontSize="12" FontWeight="Bold"
+                               Foreground="{DynamicResource PrimaryBrush}"
+                               Margin="0,0,0,10"/>
                     <StackPanel Orientation="Horizontal">
-                        <Button Command="{Binding LoadVehiclesCommand}" Content="📂 Load vehicles.meta" Width="150" Style="{StaticResource CommandButtonStyle}"/>
-                        <Button Command="{Binding LoadHandlingCommand}" Content="📂 Load handling.meta" Width="150" Style="{StaticResource CommandButtonStyle}"/>
-                        <Button Command="{Binding LoadLayoutsCommand}" Content="📂 Load layouts.meta" Width="150" Style="{StaticResource CommandButtonStyle}"/>
+                        <Button Command="{Binding LoadVehiclesCommand}"
+                                Content="📂 Load vehicles.meta"
+                                Width="160"
+                                Margin="0,0,8,0"
+                                Style="{StaticResource CommandButtonStyle}"/>
+                        <Button Command="{Binding LoadHandlingCommand}"
+                                Content="📂 Load handling.meta"
+                                Width="160"
+                                Margin="0,0,8,0"
+                                Style="{StaticResource CommandButtonStyle}"/>
+                        <Button Command="{Binding LoadLayoutsCommand}"
+                                Content="📂 Load layouts.meta"
+                                Width="160"
+                                Style="{StaticResource CommandButtonStyle}"/>
                     </StackPanel>
                 </StackPanel>
             </Border>
 
             <!-- Statistics -->
-            <Border Background="{DynamicResource SecondaryBgBrush}" CornerRadius="4" Padding="15" Margin="0,0,0,15">
+            <Border Background="{DynamicResource SecondaryBgBrush}" CornerRadius="4" Padding="15" Margin="0,0,0,12">
                 <StackPanel>
-                    <TextBlock Text="📊 Statistics" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,10"/>
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Vehicles:" Width="120" Foreground="{DynamicResource LightTextBrush}"/>
-                            <TextBlock Text="{Binding VehicleCount}" Foreground="{DynamicResource PrimaryBrush}" FontWeight="Bold"/>
+                    <TextBlock Text="📊 Statistics"
+                               FontSize="12" FontWeight="Bold"
+                               Foreground="{DynamicResource PrimaryBrush}"
+                               Margin="0,0,0,10"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Left column -->
+                        <StackPanel Grid.Column="0">
+                            <StackPanel Orientation="Horizontal" Margin="0,3">
+                                <TextBlock Text="Vehicles:" Width="90"
+                                           Foreground="{DynamicResource LightTextBrush}"/>
+                                <TextBlock Text="{Binding VehicleCount}"
+                                           Foreground="{DynamicResource PrimaryBrush}"
+                                           FontWeight="Bold"/>
+                            </StackPanel>
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="Layouts:" Width="120" Foreground="{DynamicResource LightTextBrush}"/>
-                            <TextBlock Text="{Binding LayoutCount}" Foreground="{DynamicResource PrimaryBrush}" FontWeight="Bold"/>
+
+                        <!-- Right column -->
+                        <StackPanel Grid.Column="1">
+                            <StackPanel Orientation="Horizontal" Margin="0,3">
+                                <TextBlock Text="Layouts:" Width="90"
+                                           Foreground="{DynamicResource LightTextBrush}"/>
+                                <TextBlock Text="{Binding LayoutCount}"
+                                           Foreground="{DynamicResource PrimaryBrush}"
+                                           FontWeight="Bold"/>
+                            </StackPanel>
                         </StackPanel>
-                    </StackPanel>
+                    </Grid>
                 </StackPanel>
             </Border>
 
             <!-- Recent Files -->
-            <Border Background="{DynamicResource SecondaryBgBrush}" CornerRadius="4" Padding="15" Margin="0,0,0,15">
+            <Border Background="{DynamicResource SecondaryBgBrush}" CornerRadius="4" Padding="15" Margin="0,0,0,12">
                 <StackPanel>
-                    <TextBlock Text="⏰ Recent Files" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,10"/>
-                    <ListBox ItemsSource="{Binding RecentFiles}" Background="{DynamicResource DarkBgBrush}"
-                             Foreground="{DynamicResource LightTextBrush}" Height="100" MinHeight="50"/>
+                    <TextBlock Text="⏰ Recent Files"
+                               FontSize="12" FontWeight="Bold"
+                               Foreground="{DynamicResource PrimaryBrush}"
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="Double-click a file to open it"
+                               FontSize="10"
+                               Foreground="{DynamicResource GrayTextBrush}"
+                               Margin="0,0,0,8"/>
+                    <ListBox ItemsSource="{Binding RecentFiles}"
+                             Background="{DynamicResource DarkBgBrush}"
+                             Foreground="{DynamicResource LightTextBrush}"
+                             BorderThickness="0"
+                             MinHeight="40"
+                             MaxHeight="200"
+                             ScrollViewer.VerticalScrollBarVisibility="Auto">
+                        <ListBox.ItemContainerStyle>
+                            <Style TargetType="ListBoxItem">
+                                <Setter Property="Padding" Value="8,6"/>
+                                <Setter Property="Cursor" Value="Hand"/>
+                                <EventSetter Event="MouseDoubleClick"
+                                             Handler="RecentFile_DoubleClick"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter Property="Background" Value="{DynamicResource SecondaryBgBrush}"/>
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="{DynamicResource PrimaryBrush}"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource DarkBgBrush}"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </ListBox.ItemContainerStyle>
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding FileName}"
+                                               FontWeight="SemiBold"
+                                               Foreground="{DynamicResource LightTextBrush}"/>
+                                    <TextBlock Text="{Binding FullPath}"
+                                               FontSize="10"
+                                               Foreground="{DynamicResource GrayTextBrush}"
+                                               TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <!-- Empty state -->
+                    <TextBlock Text="No recent files yet. Load a file above to get started."
+                               FontSize="10"
+                               Foreground="{DynamicResource GrayTextBrush}"
+                               Margin="0,6,0,0">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding RecentFiles.Count}" Value="0">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
                 </StackPanel>
             </Border>
 
-            <!-- Vehicles -->
-            <Border Background="{DynamicResource SecondaryBgBrush}" CornerRadius="4" Padding="15">
+            <!-- Quick Navigation -->
+            <Border Background="{DynamicResource SecondaryBgBrush}" CornerRadius="4" Padding="15" Margin="0,0,0,12">
                 <StackPanel>
-                    <TextBlock Text="🚗 Vehicles" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,10"/>
-                    <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                             Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
-                             Padding="8" Margin="0,0,0,5" Height="30"/>
-                    <ListBox ItemsSource="{Binding Vehicles}" Background="{DynamicResource DarkBgBrush}"
-                             Foreground="{DynamicResource LightTextBrush}" Height="150" MinHeight="50"/>
+                    <TextBlock Text="🧭 Quick Navigation"
+                               FontSize="12" FontWeight="Bold"
+                               Foreground="{DynamicResource PrimaryBrush}"
+                               Margin="0,0,0,10"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Command="{Binding NavigateToVehiclesCommand}"
+                                Content="→ Go to Vehicles"
+                                Width="140"
+                                Margin="0,0,8,0"
+                                Style="{StaticResource CommandButtonStyle}"/>
+                        <Button Command="{Binding NavigateToHandlingCommand}"
+                                Content="→ Go to Handling"
+                                Width="140"
+                                Margin="0,0,8,0"
+                                Style="{StaticResource CommandButtonStyle}"/>
+                        <Button Command="{Binding NavigateToLayoutsCommand}"
+                                Content="→ Go to Layouts"
+                                Width="140"
+                                Style="{StaticResource CommandButtonStyle}"/>
+                    </StackPanel>
                 </StackPanel>
             </Border>
+
+            <!-- Status -->
+            <TextBlock Text="{Binding StatusMessage}"
+                       FontSize="11"
+                       Foreground="{DynamicResource GrayTextBrush}"
+                       Margin="0,4,0,0"/>
+
         </StackPanel>
     </ScrollViewer>
 </UserControl>
-
