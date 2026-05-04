@@ -36,7 +36,7 @@
                          Padding="8" Margin="5" Height="30"/>
                 <!-- Vehicle List -->
                 <ListBox ItemsSource="{Binding FilteredVehicles}"
-                         SelectedItem="{Binding SelectedVehicle}"
+                         SelectedItem="{Binding SelectedVehicle, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                          Background="{DynamicResource DarkBgBrush}"
                          Foreground="{DynamicResource LightTextBrush}"
                          ScrollViewer.VerticalScrollBarVisibility="Auto">
