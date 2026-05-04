@@ -1,0 +1,128 @@
+<UserControl x:Class="FiveMVehicleMetaEditorWPF.Views.Tabs.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d">
+    <ScrollViewer>
+        <StackPanel Margin="30">
+            <!-- Title -->
+            <TextBlock Text="⚙️ Settings" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,20"/>
+
+            <!-- Appearance Section -->
+            <Border Background="{DynamicResource SecondaryBgBrush}" CornerRadius="4" Padding="20" Margin="0,0,0,20">
+                <StackPanel>
+                    <TextBlock Text="🎨 Appearance" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,15"/>
+
+                    <StackPanel Margin="0,0,0,12">
+                        <TextBlock Text="Dark Mode" Foreground="{DynamicResource LightTextBrush}" Margin="0,0,0,5"/>
+                        <CheckBox IsChecked="{Binding DarkMode}" Foreground="{DynamicResource LightTextBrush}" Content="Enable dark theme" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,0,12">
+                        <TextBlock Text="Compact Mode" Foreground="{DynamicResource LightTextBrush}" Margin="0,0,0,5"/>
+                        <CheckBox IsChecked="{Binding CompactMode}" Foreground="{DynamicResource LightTextBrush}" Content="Reduce button and sidebar size" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <StackPanel>
+                        <TextBlock Text="Font Size" Foreground="{DynamicResource LightTextBrush}" Margin="0,0,0,5"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Slider Value="{Binding FontSize}" Minimum="10" Maximum="16" Width="150" Margin="0,0,10,0"/>
+                            <TextBlock Text="{Binding FontSize, StringFormat={}Size: {0}}" Foreground="{DynamicResource GrayTextBrush}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- File Management Section -->
+            <Border Background="{DynamicResource SecondaryBgBrush}" CornerRadius="4" Padding="20" Margin="0,0,0,20">
+                <StackPanel>
+                    <TextBlock Text="💾 File Management" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,15"/>
+
+                    <StackPanel Margin="0,0,0,12">
+                        <TextBlock Text="Auto-Save Interval (seconds)" Foreground="{DynamicResource LightTextBrush}" Margin="0,0,0,5"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Slider Value="{Binding AutoSaveInterval}" Minimum="60" Maximum="600" SmallChange="30" Width="150" Margin="0,0,10,0"/>
+                            <TextBlock Text="{Binding AutoSaveInterval, StringFormat={}Every {0}s}" Foreground="{DynamicResource GrayTextBrush}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,0,12">
+                        <TextBlock Text="Default Directory" Foreground="{DynamicResource LightTextBrush}" Margin="0,0,0,5"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" Text="{Binding DefaultDirectory}" Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}" Padding="8" Height="30" Margin="0,0,10,0" IsReadOnly="True"/>
+                            <Button Grid.Column="1" Content="📂 Browse" Width="100" Command="{Binding BrowseDefaultDirectoryCommand}" Style="{StaticResource CommandButtonStyle}"/>
+                        </Grid>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,0,12">
+                        <TextBlock Text="Max Recent Files" Foreground="{DynamicResource LightTextBrush}" Margin="0,0,0,5"/>
+                        <StackPanel Orientation="Horizontal">
+                            <Slider Value="{Binding MaxRecentFiles}" Minimum="5" Maximum="20" Width="150" Margin="0,0,10,0"/>
+                            <TextBlock Text="{Binding MaxRecentFiles, StringFormat={}Max: {0} files}" Foreground="{DynamicResource GrayTextBrush}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel>
+                        <TextBlock Text="Backup Location" Foreground="{DynamicResource LightTextBrush}" Margin="0,0,0,5"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Column="0" Text="{Binding BackupLocation}" Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}" Padding="8" Height="30" Margin="0,0,10,0" IsReadOnly="True"/>
+                            <Button Grid.Column="1" Content="📂 Browse" Width="100" Command="{Binding BrowseBackupLocationCommand}" Style="{StaticResource CommandButtonStyle}"/>
+                        </Grid>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Behavior Section -->
+            <Border Background="{DynamicResource SecondaryBgBrush}" CornerRadius="4" Padding="20" Margin="0,0,0,20">
+                <StackPanel>
+                    <TextBlock Text="⚡ Behavior" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,15"/>
+
+                    <StackPanel Margin="0,0,0,10">
+                        <CheckBox IsChecked="{Binding AutoLoadRecentFile}" Foreground="{DynamicResource LightTextBrush}" Content="Auto-load recent file on startup" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,0,10">
+                        <CheckBox IsChecked="{Binding ShowNotifications}" Foreground="{DynamicResource LightTextBrush}" Content="Show notification messages" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <StackPanel Margin="0,0,0,10">
+                        <CheckBox IsChecked="{Binding ConfirmOnClose}" Foreground="{DynamicResource LightTextBrush}" Content="Confirm before closing application" VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <StackPanel>
+                        <CheckBox IsChecked="{Binding EnableKeyboardShortcuts}" Foreground="{DynamicResource LightTextBrush}" Content="Enable keyboard shortcuts (Ctrl+S, Ctrl+E, etc.)" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- About Section -->
+            <Border Background="{DynamicResource SecondaryBgBrush}" CornerRadius="4" Padding="20" Margin="0,0,0,20">
+                <StackPanel>
+                    <TextBlock Text="ℹ️ About" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,15"/>
+
+                    <StackPanel Margin="0,0,0,10">
+                        <TextBlock Text="Application Version" Foreground="{DynamicResource LightTextBrush}" Margin="0,0,0,3"/>
+                        <TextBlock Text="{Binding AppVersion}" Foreground="{DynamicResource PrimaryBrush}" FontWeight="Bold"/>
+                    </StackPanel>
+
+                    <StackPanel>
+                        <TextBlock Text="Made with 💚 for the FiveM Community" FontSize="11" Foreground="{DynamicResource GrayTextBrush}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Save Button -->
+            <Button Content="💾 Save Settings" Width="150" Height="40" Margin="0,20,0,0" Command="{Binding SaveCommand}" Background="{DynamicResource PrimaryBrush}" Foreground="White" FontSize="12" FontWeight="Bold"/>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
+

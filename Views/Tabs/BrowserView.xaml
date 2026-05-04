@@ -1,0 +1,64 @@
+<UserControl x:Class="FiveMVehicleMetaEditorWPF.Views.Tabs.BrowserView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d">
+    <ScrollViewer>
+        <StackPanel Margin="20">
+            <!-- Title -->
+            <TextBlock Text="📋 Data Browser" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}"/>
+
+            <!-- File Operations -->
+            <Border Background="{DynamicResource SecondaryBgBrush}" CornerRadius="4" Padding="15" Margin="0,0,0,15">
+                <StackPanel>
+                    <TextBlock Text="📂 File Operations" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,10"/>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Command="{Binding LoadVehiclesCommand}" Content="📂 Load vehicles.meta" Width="150" Style="{StaticResource CommandButtonStyle}"/>
+                        <Button Command="{Binding LoadHandlingCommand}" Content="📂 Load handling.meta" Width="150" Style="{StaticResource CommandButtonStyle}"/>
+                        <Button Command="{Binding LoadLayoutsCommand}" Content="📂 Load layouts.meta" Width="150" Style="{StaticResource CommandButtonStyle}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Statistics -->
+            <Border Background="{DynamicResource SecondaryBgBrush}" CornerRadius="4" Padding="15" Margin="0,0,0,15">
+                <StackPanel>
+                    <TextBlock Text="📊 Statistics" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,10"/>
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Vehicles:" Width="120" Foreground="{DynamicResource LightTextBrush}"/>
+                            <TextBlock Text="{Binding VehicleCount}" Foreground="{DynamicResource PrimaryBrush}" FontWeight="Bold"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Layouts:" Width="120" Foreground="{DynamicResource LightTextBrush}"/>
+                            <TextBlock Text="{Binding LayoutCount}" Foreground="{DynamicResource PrimaryBrush}" FontWeight="Bold"/>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Recent Files -->
+            <Border Background="{DynamicResource SecondaryBgBrush}" CornerRadius="4" Padding="15" Margin="0,0,0,15">
+                <StackPanel>
+                    <TextBlock Text="⏰ Recent Files" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,10"/>
+                    <ListBox ItemsSource="{Binding RecentFiles}" Background="{DynamicResource DarkBgBrush}"
+                             Foreground="{DynamicResource LightTextBrush}" Height="100" MinHeight="50"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Vehicles -->
+            <Border Background="{DynamicResource SecondaryBgBrush}" CornerRadius="4" Padding="15">
+                <StackPanel>
+                    <TextBlock Text="🚗 Vehicles" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,10"/>
+                    <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                             Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                             Padding="8" Margin="0,0,0,5" Height="30"/>
+                    <ListBox ItemsSource="{Binding Vehicles}" Background="{DynamicResource DarkBgBrush}"
+                             Foreground="{DynamicResource LightTextBrush}" Height="150" MinHeight="50"/>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
+

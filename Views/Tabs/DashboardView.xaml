@@ -1,0 +1,68 @@
+<UserControl x:Class="FiveMVehicleMetaEditorWPF.Views.Tabs.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d">
+    <ScrollViewer>
+        <StackPanel Margin="20">
+            <!-- Title -->
+            <TextBlock Text="📊 Dashboard" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,5"/>
+            <TextBlock Text="Welcome to FiveM Vehicle Meta Editor" FontSize="14" Foreground="{DynamicResource LightTextBrush}"/>
+            <TextBlock Text="v1.0 - Complete Meta Management Suite" FontSize="10" Foreground="{DynamicResource GrayTextBrush}" Margin="0,0,0,20"/>
+
+            <!-- Stats -->
+            <Border Background="{DynamicResource SecondaryBgBrush}" CornerRadius="4" Padding="15" Margin="0,0,0,15">
+                <StackPanel>
+                    <TextBlock Text="📈 Quick Stats" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,10"/>
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,3">
+                            <TextBlock Text="Backups:" Width="120" Foreground="{DynamicResource LightTextBrush}"/>
+                            <TextBlock Text="{Binding BackupCount}" Foreground="{DynamicResource PrimaryBrush}" FontWeight="Bold"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,3">
+                            <TextBlock Text="Custom Presets:" Width="120" Foreground="{DynamicResource LightTextBrush}"/>
+                            <TextBlock Text="{Binding PresetCount}" Foreground="{DynamicResource PrimaryBrush}" FontWeight="Bold"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,3">
+                            <TextBlock Text="Version:" Width="120" Foreground="{DynamicResource LightTextBrush}"/>
+                            <TextBlock Text="{Binding AppVersion}" Foreground="{DynamicResource PrimaryBrush}" FontWeight="Bold"/>
+                        </StackPanel>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Features -->
+            <Border Background="{DynamicResource SecondaryBgBrush}" CornerRadius="4" Padding="15" Margin="0,0,0,15">
+                <StackPanel>
+                    <TextBlock Text="⭐ Features" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,10"/>
+                    <ItemsControl ItemsSource="{Binding Features}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" Foreground="{DynamicResource LightTextBrush}" Margin="0,3"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- Keyboard Shortcuts -->
+            <Border Background="{DynamicResource SecondaryBgBrush}" CornerRadius="4" Padding="15" Margin="0,0,0,15">
+                <StackPanel>
+                    <TextBlock Text="⌨️ Keyboard Shortcuts" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,10"/>
+                    <ItemsControl ItemsSource="{Binding Shortcuts}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" Foreground="{DynamicResource LightTextBrush}" Margin="0,3" FontSize="10"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <!-- Footer -->
+            <TextBlock Text="Made with 💚 for the FiveM Community" FontSize="9" Foreground="{DynamicResource GrayTextBrush}" Margin="0,20,0,0"/>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>
+

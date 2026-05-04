@@ -1,0 +1,159 @@
+<Window x:Class="FiveMVehicleMetaEditorWPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FiveMVehicleMetaEditorWPF"
+        xmlns:views="clr-namespace:FiveMVehicleMetaEditorWPF.Views.Tabs"
+        mc:Ignorable="d"
+        Title="FiveM Vehicle Meta Editor"
+        Height="900"
+        Width="1400"
+        MinHeight="600"
+        MinWidth="1000"
+        Background="{DynamicResource DarkBgBrush}"
+        WindowStartupLocation="CenterScreen"
+        StateChanged="Window_StateChanged"
+        LocationChanged="Window_LocationChanged"
+        SizeChanged="Window_SizeChanged">
+    <Window.Icon>
+        <BitmapImage UriSource="logog.png"/>
+    </Window.Icon>
+
+    <Window.Resources>
+        <Style x:Key="SidebarButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="{DynamicResource LightTextBrush}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="10,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#252D38"/>
+                                <Setter Property="BorderThickness" Value="3,0,0,0"/>
+                                <Setter Property="BorderBrush" Value="{DynamicResource PrimaryBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="70"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="30"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Top Header Bar with Gradient -->
+        <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" BorderThickness="0,0,0,2" BorderBrush="#FF9500">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                    <GradientStop Color="#1A2332" Offset="0"/>
+                    <GradientStop Color="#0F1419" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="15,0">
+                <Image Source="logog.png" Height="55" Width="55" Margin="0,5,15,5" RenderOptions.BitmapScalingMode="HighQuality"/>
+                <TextBlock Text="FiveM Vehicle Meta Editor" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Left Sidebar -->
+        <Border Grid.Row="1" Grid.Column="0" Background="{DynamicResource DarkBgBrush}" BorderThickness="0,0,1,0" BorderBrush="#333333">
+            <StackPanel Orientation="Vertical">
+                <!-- Navigation Buttons -->
+                <StackPanel Orientation="Vertical">
+                    <Button Click="TabButton_Click" Tag="dashboard" Height="50" Margin="5,2" HorizontalContentAlignment="Left" Style="{StaticResource SidebarButtonStyle}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📊" FontSize="16" Margin="0,0,8,0"/>
+                            <TextBlock Text="Dashboard" FontSize="11" VerticalAlignment="Center" Foreground="{DynamicResource LightTextBrush}"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Click="TabButton_Click" Tag="browser" Height="55" Margin="0" HorizontalContentAlignment="Left" Style="{StaticResource SidebarButtonStyle}">
+                        <TextBlock Text="📋 Browser" FontSize="12" Foreground="{DynamicResource LightTextBrush}"/>
+                    </Button>
+                    <Button Click="TabButton_Click" Tag="vehicles" Height="55" Margin="0" HorizontalContentAlignment="Left" Style="{StaticResource SidebarButtonStyle}">
+                        <TextBlock Text="🚗 Vehicles" FontSize="12" Foreground="{DynamicResource LightTextBrush}"/>
+                    </Button>
+                    <Button Click="TabButton_Click" Tag="generator" Height="55" Margin="0" HorizontalContentAlignment="Left" Style="{StaticResource SidebarButtonStyle}">
+                        <TextBlock Text="🔧 Generator" FontSize="12" Foreground="{DynamicResource LightTextBrush}"/>
+                    </Button>
+                    <Button Click="TabButton_Click" Tag="handling" Height="55" Margin="0" HorizontalContentAlignment="Left" Style="{StaticResource SidebarButtonStyle}">
+                        <TextBlock Text="⚙️ Handling" FontSize="12" Foreground="{DynamicResource LightTextBrush}"/>
+                    </Button>
+                    <Button Click="TabButton_Click" Tag="merger" Height="55" Margin="0" HorizontalContentAlignment="Left" Style="{StaticResource SidebarButtonStyle}">
+                        <TextBlock Text="🔀 Merger" FontSize="12" Foreground="{DynamicResource LightTextBrush}"/>
+                    </Button>
+                    <Button Click="TabButton_Click" Tag="splitter" Height="55" Margin="0" HorizontalContentAlignment="Left" Style="{StaticResource SidebarButtonStyle}">
+                        <TextBlock Text="✂️ Splitter" FontSize="12" Foreground="{DynamicResource LightTextBrush}"/>
+                    </Button>
+                    <Button Click="TabButton_Click" Tag="validator" Height="55" Margin="0" HorizontalContentAlignment="Left" Style="{StaticResource SidebarButtonStyle}">
+                        <TextBlock Text="✓ Validator" FontSize="12" Foreground="{DynamicResource LightTextBrush}"/>
+                    </Button>
+                    <Button Click="TabButton_Click" Tag="carcols" Height="55" Margin="0" HorizontalContentAlignment="Left" Style="{StaticResource SidebarButtonStyle}">
+                        <TextBlock Text="🚨 Carcols" FontSize="12" Foreground="{DynamicResource LightTextBrush}"/>
+                    </Button>
+                    <Button Click="TabButton_Click" Tag="layouts" Height="55" Margin="0" HorizontalContentAlignment="Left" Style="{StaticResource SidebarButtonStyle}">
+                        <TextBlock Text="🗺️ Layouts" FontSize="12" Foreground="{DynamicResource LightTextBrush}"/>
+                    </Button>
+                    <Button Click="TabButton_Click" Tag="carvariations" Height="55" Margin="0" HorizontalContentAlignment="Left" Style="{StaticResource SidebarButtonStyle}">
+                        <TextBlock Text="🎨 Variations" FontSize="12" Foreground="{DynamicResource LightTextBrush}"/>
+                    </Button>
+                    <Button Click="TabButton_Click" Tag="settings" Height="55" Margin="0" HorizontalContentAlignment="Left" Style="{StaticResource SidebarButtonStyle}">
+                        <TextBlock Text="⚙️ Settings" FontSize="12" Foreground="{DynamicResource LightTextBrush}"/>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Content Area -->
+        <Border Grid.Row="1" Grid.Column="1" Background="{DynamicResource DarkBgBrush}">
+            <Grid>
+                <!-- DEBUG: Current Tab Display -->
+                <TextBlock Text="{Binding CurrentTab, StringFormat='Current Tab: {0}'}"
+                           Foreground="{DynamicResource GrayTextBrush}"
+                           Padding="10,5" FontSize="10"
+                           VerticalAlignment="Top" HorizontalAlignment="Left"/>
+
+                <!-- Content based on CurrentTab -->
+                <views:DashboardView x:Name="DashboardTabView"
+                    Visibility="{Binding DataContext.CurrentTab, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=dashboard}"/>
+                <views:BrowserView x:Name="BrowserTabView" Visibility="{Binding DataContext.CurrentTab, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=browser}"/>
+                <views:VehiclesView x:Name="VehiclesTabView" Visibility="{Binding DataContext.CurrentTab, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=vehicles}"/>
+                <views:GeneratorView x:Name="GeneratorTabView" Visibility="{Binding DataContext.CurrentTab, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=generator}"/>
+                <views:HandlingView x:Name="HandlingTabView" Visibility="{Binding DataContext.CurrentTab, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=handling}"/>
+                <views:MergerView x:Name="MergerTabView" Visibility="{Binding DataContext.CurrentTab, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=merger}"/>
+                <views:SplitterView x:Name="SplitterTabView" Visibility="{Binding DataContext.CurrentTab, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=splitter}"/>
+                <views:ValidatorView x:Name="ValidatorTabView" Visibility="{Binding DataContext.CurrentTab, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=validator}"/>
+                <views:CarcolsView x:Name="CarcolsTabView" Visibility="{Binding DataContext.CurrentTab, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=carcols}"/>
+                <views:LayoutsView x:Name="LayoutsTabView" Visibility="{Binding DataContext.CurrentTab, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=layouts}"/>
+                <views:CarvariationsView x:Name="CarvariationsTabView" Visibility="{Binding DataContext.CurrentTab, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=carvariations}"/>
+                <views:SettingsView x:Name="SettingsTabView" Visibility="{Binding DataContext.CurrentTab, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=settings}"/>
+            </Grid>
+        </Border>
+
+        <!-- Status Bar (Bottom) -->
+        <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Background="{StaticResource TertiaryBgBrush}" BorderThickness="0,1,0,0" BorderBrush="#FF9500">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0">
+                <TextBlock Text="{Binding StatusMessage}" Foreground="{DynamicResource GrayTextBrush}" VerticalAlignment="Center" FontSize="11"/>
+                <ProgressBar IsIndeterminate="True" Width="100" Height="4" Margin="10,0,0,0" Visibility="{Binding IsLoading, Converter={StaticResource BoolToVisConverter}}"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
+
