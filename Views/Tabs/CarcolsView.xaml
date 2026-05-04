@@ -10,30 +10,73 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="280"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
         <!-- Toolbar -->
-        <Border Grid.Row="0" Background="{DynamicResource SecondaryBgBrush}" Padding="10">
+        <Border Grid.Row="0" Grid.ColumnSpan="2" Background="{DynamicResource SecondaryBgBrush}" Padding="10">
             <StackPanel Orientation="Horizontal">
                 <Button Command="{Binding LoadCommand}" Content="📂 Load" Width="80" Style="{StaticResource CommandButtonStyle}"/>
                 <Button Command="{Binding SaveCommand}" Content="💾 Save" Width="80" Style="{StaticResource CommandButtonStyle}"/>
                 <Button Command="{Binding ExportCommand}" Content="📤 Export" Width="80" Style="{StaticResource CommandButtonStyle}"/>
+                <Separator Width="10"/>
+                <TextBlock Text="{Binding CarcolEntries.Count}" Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center" FontWeight="Bold" FontSize="14"/>
+                <TextBlock Text=" kits" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
             </StackPanel>
         </Border>
 
-        <!-- Content -->
-        <Border Grid.Row="1" Background="{DynamicResource SecondaryBgBrush}" Margin="10" Padding="15">
-            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                <TextBlock Text="🚨 Carcols" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" TextAlignment="Center"/>
-                <TextBlock Text="Edit vehicle color palettes" FontSize="14" Foreground="{DynamicResource LightTextBrush}" TextAlignment="Center" Margin="0,10"/>
-                <TextBlock Text="Load a carcols.meta file to get started" FontSize="11" Foreground="{DynamicResource GrayTextBrush}" TextAlignment="Center" Margin="0,20"/>
+        <!-- Left: Kit List -->
+        <Border Grid.Row="1" Grid.Column="0" Background="{DynamicResource SecondaryBgBrush}" Margin="5">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Row="0" Text="🚨 Mod Kits" FontSize="12" FontWeight="Bold"
+                           Foreground="{DynamicResource PrimaryBrush}" Margin="8,8,8,5"/>
+                <ListBox Grid.Row="1"
+                         ItemsSource="{Binding CarcolEntries}"
+                         SelectedItem="{Binding SelectedEntry}"
+                         Background="{DynamicResource DarkBgBrush}"
+                         Foreground="{DynamicResource LightTextBrush}"
+                         ScrollViewer.VerticalScrollBarVisibility="Auto">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" Foreground="{DynamicResource LightTextBrush}" Padding="2"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+        </Border>
+
+        <!-- Right: Info Panel -->
+        <Border Grid.Row="1" Grid.Column="1" Background="{DynamicResource SecondaryBgBrush}" Margin="5" Padding="15">
+            <StackPanel>
+                <TextBlock Text="🚨 Carcols Editor" FontSize="14" FontWeight="Bold"
+                           Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,10"/>
+
+                <!-- When nothing selected -->
+                <StackPanel Visibility="{Binding SelectedEntry, Converter={StaticResource BoolToVisInverseConverter}}">
+                    <TextBlock Text="Select a mod kit from the list to view details."
+                               FontSize="11" Foreground="{DynamicResource GrayTextBrush}" TextWrapping="Wrap"/>
+                </StackPanel>
+
+                <!-- When selected -->
+                <StackPanel Visibility="{Binding SelectedEntry, Converter={StaticResource BoolToVisConverter}}">
+                    <TextBlock Text="Selected Kit:" Foreground="{DynamicResource GrayTextBrush}" FontSize="11"/>
+                    <TextBlock Text="{Binding SelectedEntry}" FontSize="16" FontWeight="Bold"
+                               Foreground="{DynamicResource PrimaryBrush}" Margin="0,3,0,15"/>
+                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource LightTextBrush}" FontSize="11"
+                               Text="This mod kit contains vehicle modification data including visible mods, link mods, and stat mods. Load and Save to modify the carcols.meta file."/>
+                </StackPanel>
             </StackPanel>
         </Border>
 
         <!-- Status Bar -->
-        <Border Grid.Row="2" Background="{StaticResource TertiaryBgBrush}" Padding="10">
+        <Border Grid.Row="2" Grid.ColumnSpan="2" Background="{StaticResource TertiaryBgBrush}" Padding="10">
             <TextBlock Text="{Binding StatusMessage}" Foreground="{DynamicResource GrayTextBrush}"/>
         </Border>
     </Grid>
 </UserControl>
-
-

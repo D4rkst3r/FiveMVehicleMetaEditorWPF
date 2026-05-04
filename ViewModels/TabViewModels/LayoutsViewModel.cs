@@ -32,7 +32,17 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
         public LayoutData? SelectedLayout
         {
             get => _selectedLayout;
-            set { _selectedLayout = value; OnPropertyChanged(); UpdateLayoutProperties(); }
+            set
+            {
+                _selectedLayout = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(LayoutName));
+                OnPropertyChanged(nameof(Category));
+                OnPropertyChanged(nameof(HasRoof));
+                OnPropertyChanged(nameof(HasTrunk));
+                OnPropertyChanged(nameof(HasHood));
+                UpdateLayoutProperties();
+            }
         }
 
         // Search text for filtering
