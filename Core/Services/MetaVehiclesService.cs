@@ -32,8 +32,8 @@ namespace FiveMVehicleMetaEditorWPF.Core.Services
 
                 var vehicles = new List<Vehicle>();
 
-                // Find all InitDataList/Item elements
-                var items = root.Descendants("InitDataList")
+                // Find all InitDatas/Item elements
+                var items = root.Descendants("InitDatas")
                     .Elements("Item")
                     .ToList();
 
