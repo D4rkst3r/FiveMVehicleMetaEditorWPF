@@ -30,7 +30,7 @@
                          Foreground="{DynamicResource LightTextBrush}" Height="400" Padding="10">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding}" TextWrapping="Wrap" Margin="0,3"/>
+                            <TextBlock Text="{Binding}" TextWrapping="Wrap" Margin="0,3" Foreground="{DynamicResource LightTextBrush}"/>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>

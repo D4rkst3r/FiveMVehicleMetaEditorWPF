@@ -31,8 +31,9 @@ namespace FiveMVehicleMetaEditorWPF.Core.Services
 
                 var layoutList = new List<LayoutData>();
 
-                // Find all layout entries
-                var items = root.Descendants("Layout")
+                // Find all layout entries under <Layouts><Item> structure
+                var items = root.Descendants("Layouts")
+                    .Elements("Item")
                     .ToList();
 
                 foreach (var item in items)
@@ -114,7 +115,9 @@ namespace FiveMVehicleMetaEditorWPF.Core.Services
                 var doc = new XDocument(
                     new XDeclaration("1.0", "UTF-8", null),
                     new XElement("CVehicleLayouts",
-                        layoutList.Select(l => CreateLayoutElement(l))
+                        new XElement("Layouts",
+                            layoutList.Select(l => CreateLayoutElement(l))
+                        )
                     )
                 );
 
@@ -160,7 +163,7 @@ namespace FiveMVehicleMetaEditorWPF.Core.Services
                 ))
             );
 
-            var elem = new XElement("Layout",
+            var elem = new XElement("Item",
                 new XElement("layoutName", layout.LayoutName),
                 new XElement("category", layout.Category),
                 seatsElement,

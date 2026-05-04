@@ -39,7 +39,7 @@
                          ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding HandlingName}" FontSize="11"/>
+                            <TextBlock Text="{Binding HandlingName}" FontSize="11" Foreground="{DynamicResource LightTextBrush}"/>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>

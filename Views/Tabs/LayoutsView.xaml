@@ -38,7 +38,7 @@
                     <ListBox.ItemTemplate>
                         <DataTemplate>
                             <StackPanel>
-                                <TextBlock Text="{Binding LayoutName}" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding LayoutName}" FontWeight="Bold" Foreground="{DynamicResource LightTextBrush}"/>
                                 <TextBlock Text="{Binding Category}" FontSize="10" Foreground="{DynamicResource GrayTextBrush}"/>
                             </StackPanel>
                         </DataTemplate>
