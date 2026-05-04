@@ -10,12 +10,10 @@ namespace FiveMVehicleMetaEditorWPF.Views.Tabs
         public SplitterView()
         {
             InitializeComponent();
-            Loaded += (s, e) =>
-            {
-                var mainWindow = Window.GetWindow(this) as MainWindow;
-                var mainVM = mainWindow?.DataContext as MainWindowViewModel;
-                DataContext = new SplitterViewModel(mainVM);
-            };
+            // Set DataContext immediately so XAML bindings work from initialization
+            var mainWindow = System.Windows.Application.Current.MainWindow as MainWindow;
+            var mainVM = mainWindow?.DataContext as MainWindowViewModel;
+            DataContext = new SplitterViewModel(mainVM);
         }
     }
 }

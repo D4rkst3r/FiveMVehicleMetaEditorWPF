@@ -1,4 +1,3 @@
-using System.Windows;
 using System.Windows.Controls;
 using FiveMVehicleMetaEditorWPF.ViewModels;
 using FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels;
@@ -10,12 +9,10 @@ namespace FiveMVehicleMetaEditorWPF.Views.Tabs
         public BrowserView()
         {
             InitializeComponent();
-            Loaded += (s, e) =>
-            {
-                var mainWindow = Window.GetWindow(this) as MainWindow;
-                var mainVM = mainWindow?.DataContext as MainWindowViewModel;
-                DataContext = new BrowserViewModel(mainVM);
-            };
+            // Set DataContext immediately so XAML bindings work
+            var mainWindow = System.Windows.Application.Current.MainWindow as MainWindow;
+            var mainVM = mainWindow?.DataContext as MainWindowViewModel;
+            DataContext = new BrowserViewModel(mainVM);
         }
     }
 }
