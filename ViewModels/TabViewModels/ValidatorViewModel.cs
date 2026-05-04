@@ -1,7 +1,11 @@
 using System;
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Text;
 using System.Windows.Input;
 using FiveMVehicleMetaEditorWPF.Core;
+using FiveMVehicleMetaEditorWPF.Core.Services;
+using Newtonsoft.Json.Linq;
 
 namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
 {
@@ -39,12 +43,51 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
         {
             try
             {
-                ShowInfo("Select a meta file to validate...");
-                ShowSuccess("Load meta file (placeholder)");
+                var filePath = FileService.OpenFileDialog("meta");
+                if (filePath == null) return;
+
+                ShowInfo("Loading meta file for validation...");
+                IsLoading = true;
+
+                // Validate the file exists and is readable
+                if (!File.Exists(filePath))
+                {
+                    ShowError("File not found");
+                    return;
+                }
+
+                // Try to parse as XML to validate structure
+                try
+                {
+                    var doc = JObject.Parse(File.ReadAllText(filePath));
+                    _selectedFilePath = filePath;
+                    ValidationResults.Clear();
+                    ShowSuccess($"Loaded {Path.GetFileName(filePath)} - ready to validate");
+                }
+                catch
+                {
+                    // File might be XML, try parsing as XML
+                    try
+                    {
+                        var xmlContent = File.ReadAllText(filePath);
+                        var doc = System.Xml.Linq.XDocument.Parse(xmlContent);
+                        _selectedFilePath = filePath;
+                        ValidationResults.Clear();
+                        ShowSuccess($"Loaded {Path.GetFileName(filePath)} - ready to validate");
+                    }
+                    catch (Exception ex)
+                    {
+                        ShowError($"File is not valid JSON or XML: {ex.Message}");
+                    }
+                }
             }
             catch (Exception ex)
             {
                 ShowError($"Error: {ex.Message}");
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
 
@@ -76,12 +119,43 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
         {
             try
             {
-                ShowInfo("Export validation report...");
-                ShowSuccess("Export validation report (placeholder)");
+                if (ValidationResults.Count == 0)
+                {
+                    ShowError("No validation results to export");
+                    return;
+                }
+
+                var filePath = FileService.SaveFileDialog("txt", "validation_report.txt");
+                if (filePath == null) return;
+
+                ShowInfo("Exporting validation report...");
+                IsLoading = true;
+
+                var reportContent = new System.Text.StringBuilder();
+                reportContent.AppendLine("=== VALIDATION REPORT ===");
+                reportContent.AppendLine($"Generated: {DateTime.Now:yyyy-MM-dd HH:mm:ss}");
+                if (!string.IsNullOrEmpty(_selectedFilePath))
+                {
+                    reportContent.AppendLine($"File: {Path.GetFileName(_selectedFilePath)}");
+                }
+                reportContent.AppendLine("=========================");
+                reportContent.AppendLine();
+
+                foreach (var result in ValidationResults)
+                {
+                    reportContent.AppendLine(result);
+                }
+
+                File.WriteAllText(filePath, reportContent.ToString());
+                ShowSuccess($"Exported validation report to {Path.GetFileName(filePath)}");
             }
             catch (Exception ex)
             {
-                ShowError($"Error: {ex.Message}");
+                ShowError($"Error exporting: {ex.Message}");
+            }
+            finally
+            {
+                IsLoading = false;
             }
         }
     }
