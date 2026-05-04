@@ -60,6 +60,18 @@ namespace FiveMVehicleMetaEditorWPF.Core.Services
                         OriginalElement = item
                     };
 
+                    // Parse AnimRate values from sub-elements
+                    layout.NormalEntrySP        = ParseRate(item, "NormalEntry",      "SPRate");
+                    layout.NormalEntryMP        = ParseRate(item, "NormalEntry",      "MPRate");
+                    layout.AnimCombatEntrySP    = ParseRate(item, "AnimCombatEntry",  "SPRate");
+                    layout.AnimCombatEntryMP    = ParseRate(item, "AnimCombatEntry",  "MPRate");
+                    layout.NoAnimCombatEntrySP  = ParseRate(item, "NoAnimCombatEntry","SPRate");
+                    layout.NoAnimCombatEntryMP  = ParseRate(item, "NoAnimCombatEntry","MPRate");
+                    layout.ForcedEntrySP        = ParseRate(item, "ForcedEntry",      "SPRate");
+                    layout.ForcedEntryMP        = ParseRate(item, "ForcedEntry",      "MPRate");
+                    layout.NormalExitSP         = ParseRate(item, "NormalExit",       "SPRate");
+                    layout.NormalExitMP         = ParseRate(item, "NormalExit",       "MPRate");
+
                     layoutList.Add(layout);
                 }
 
@@ -101,6 +113,21 @@ namespace FiveMVehicleMetaEditorWPF.Core.Services
             {
                 return (false, $"Error saving vehiclelayouts.meta: {ex.Message}");
             }
+        }
+
+        /// <summary>
+        /// Parse a float rate value from an XML sub-section element's attribute
+        /// </summary>
+        private float ParseRate(XElement item, string section, string rateAttr)
+        {
+            var elem = item.Element(section)?.Element(rateAttr);
+            if (elem != null && float.TryParse(
+                    elem.Attribute("value")?.Value,
+                    System.Globalization.NumberStyles.Float,
+                    System.Globalization.CultureInfo.InvariantCulture,
+                    out var val))
+                return val;
+            return 1.0f;
         }
 
         /// <summary>

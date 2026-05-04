@@ -11,7 +11,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="280"/>
+            <ColumnDefinition Width="260"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
@@ -44,34 +44,83 @@
                          ScrollViewer.VerticalScrollBarVisibility="Auto">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding}" Foreground="{DynamicResource LightTextBrush}" Padding="2"/>
+                            <TextBlock Text="{Binding}" Foreground="{DynamicResource LightTextBrush}" Padding="2" TextTrimming="CharacterEllipsis"/>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
             </Grid>
         </Border>
 
-        <!-- Right: Info Panel -->
+        <!-- Right: Kit Details -->
         <Border Grid.Row="1" Grid.Column="1" Background="{DynamicResource SecondaryBgBrush}" Margin="5" Padding="15">
-            <StackPanel>
-                <TextBlock Text="🚨 Carcols Editor" FontSize="14" FontWeight="Bold"
-                           Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,10"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-                <!-- When nothing selected -->
-                <StackPanel Visibility="{Binding SelectedEntry, Converter={StaticResource BoolToVisInverseConverter}}">
-                    <TextBlock Text="Select a mod kit from the list to view details."
+                <!-- Empty state -->
+                <StackPanel Grid.Row="0" Visibility="{Binding SelectedEntry, Converter={StaticResource BoolToVisInverseConverter}}">
+                    <TextBlock Text="🚨 Carcols Editor" FontSize="14" FontWeight="Bold"
+                               Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,10"/>
+                    <TextBlock Text="Select a mod kit from the list to view its details."
                                FontSize="11" Foreground="{DynamicResource GrayTextBrush}" TextWrapping="Wrap"/>
                 </StackPanel>
 
-                <!-- When selected -->
-                <StackPanel Visibility="{Binding SelectedEntry, Converter={StaticResource BoolToVisConverter}}">
-                    <TextBlock Text="Selected Kit:" Foreground="{DynamicResource GrayTextBrush}" FontSize="11"/>
-                    <TextBlock Text="{Binding SelectedEntry}" FontSize="16" FontWeight="Bold"
-                               Foreground="{DynamicResource PrimaryBrush}" Margin="0,3,0,15"/>
-                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource LightTextBrush}" FontSize="11"
-                               Text="This mod kit contains vehicle modification data including visible mods, link mods, and stat mods. Load and Save to modify the carcols.meta file."/>
-                </StackPanel>
-            </StackPanel>
+                <!-- Kit details -->
+                <ScrollViewer Grid.Row="0" Grid.RowSpan="2"
+                              Visibility="{Binding SelectedEntry, Converter={StaticResource BoolToVisConverter}}">
+                    <StackPanel>
+                        <!-- Kit name header -->
+                        <TextBlock Text="{Binding SelectedEntry}" FontSize="16" FontWeight="Bold"
+                                   Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,12" TextWrapping="Wrap"/>
+
+                        <!-- Info grid -->
+                        <Border Background="{DynamicResource DarkBgBrush}" CornerRadius="4" Padding="10" Margin="0,0,0,12">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Kit ID:" Foreground="{DynamicResource GrayTextBrush}" FontSize="11" Margin="0,2"/>
+                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding KitId}" Foreground="{DynamicResource LightTextBrush}" FontSize="11" Margin="0,2"/>
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Kit Type:" Foreground="{DynamicResource GrayTextBrush}" FontSize="11" Margin="0,2"/>
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding KitType}" Foreground="{DynamicResource LightTextBrush}" FontSize="11" Margin="0,2"/>
+
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Visible Mods:" Foreground="{DynamicResource GrayTextBrush}" FontSize="11" Margin="0,2"/>
+                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding VisibleModCount}" Foreground="{DynamicResource PrimaryBrush}" FontWeight="Bold" FontSize="11" Margin="0,2"/>
+
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Stat Mods:" Foreground="{DynamicResource GrayTextBrush}" FontSize="11" Margin="0,2"/>
+                                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding StatModCount}" Foreground="{DynamicResource PrimaryBrush}" FontWeight="Bold" FontSize="11" Margin="0,2"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Visible Mods list -->
+                        <TextBlock Text="Visible Mods" FontSize="12" FontWeight="Bold"
+                                   Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,6"/>
+                        <ListBox ItemsSource="{Binding VisibleMods}"
+                                 Background="{DynamicResource DarkBgBrush}"
+                                 Foreground="{DynamicResource LightTextBrush}"
+                                 MaxHeight="300"
+                                 ScrollViewer.VerticalScrollBarVisibility="Auto">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" FontSize="11"
+                                               Foreground="{DynamicResource LightTextBrush}" Padding="2"/>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
         </Border>
 
         <!-- Status Bar -->

@@ -24,6 +24,18 @@ namespace FiveMVehicleMetaEditorWPF.Core.Models
         // Cover extents for seat covers
         public Dictionary<string, (float Min, float Max)> CoverExtents { get; set; } = new();
 
+        // AnimRateSet values (from vehiclelayouts.meta CAnimRateSet entries)
+        public float NormalEntrySP { get; set; } = 1.0f;
+        public float NormalEntryMP { get; set; } = 1.5f;
+        public float AnimCombatEntrySP { get; set; } = 1.0f;
+        public float AnimCombatEntryMP { get; set; } = 1.5f;
+        public float NoAnimCombatEntrySP { get; set; } = 1.5f;
+        public float NoAnimCombatEntryMP { get; set; } = 1.5f;
+        public float ForcedEntrySP { get; set; } = 1.2f;
+        public float ForcedEntryMP { get; set; } = 1.35f;
+        public float NormalExitSP { get; set; } = 1.0f;
+        public float NormalExitMP { get; set; } = 1.35f;
+
         // Original XML element
         public object? OriginalElement { get; set; }
 

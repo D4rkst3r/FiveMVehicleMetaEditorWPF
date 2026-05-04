@@ -41,6 +41,14 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
                 OnPropertyChanged(nameof(HasRoof));
                 OnPropertyChanged(nameof(HasTrunk));
                 OnPropertyChanged(nameof(HasHood));
+                OnPropertyChanged(nameof(NormalEntrySP));
+                OnPropertyChanged(nameof(NormalEntryMP));
+                OnPropertyChanged(nameof(AnimCombatEntrySP));
+                OnPropertyChanged(nameof(AnimCombatEntryMP));
+                OnPropertyChanged(nameof(ForcedEntrySP));
+                OnPropertyChanged(nameof(ForcedEntryMP));
+                OnPropertyChanged(nameof(NormalExitSP));
+                OnPropertyChanged(nameof(NormalExitMP));
                 UpdateLayoutProperties();
             }
         }
@@ -106,6 +114,48 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
         {
             get => _selectedLayout?.HasHood ?? _hasHood;
             set { if (_selectedLayout != null) _selectedLayout.HasHood = value; OnPropertyChanged(); }
+        }
+
+        // AnimRate properties (forwarded to the selected LayoutData model)
+        public float NormalEntrySP
+        {
+            get => _selectedLayout?.NormalEntrySP ?? 1.0f;
+            set { if (_selectedLayout != null) _selectedLayout.NormalEntrySP = value; OnPropertyChanged(); }
+        }
+        public float NormalEntryMP
+        {
+            get => _selectedLayout?.NormalEntryMP ?? 1.5f;
+            set { if (_selectedLayout != null) _selectedLayout.NormalEntryMP = value; OnPropertyChanged(); }
+        }
+        public float AnimCombatEntrySP
+        {
+            get => _selectedLayout?.AnimCombatEntrySP ?? 1.0f;
+            set { if (_selectedLayout != null) _selectedLayout.AnimCombatEntrySP = value; OnPropertyChanged(); }
+        }
+        public float AnimCombatEntryMP
+        {
+            get => _selectedLayout?.AnimCombatEntryMP ?? 1.5f;
+            set { if (_selectedLayout != null) _selectedLayout.AnimCombatEntryMP = value; OnPropertyChanged(); }
+        }
+        public float ForcedEntrySP
+        {
+            get => _selectedLayout?.ForcedEntrySP ?? 1.2f;
+            set { if (_selectedLayout != null) _selectedLayout.ForcedEntrySP = value; OnPropertyChanged(); }
+        }
+        public float ForcedEntryMP
+        {
+            get => _selectedLayout?.ForcedEntryMP ?? 1.35f;
+            set { if (_selectedLayout != null) _selectedLayout.ForcedEntryMP = value; OnPropertyChanged(); }
+        }
+        public float NormalExitSP
+        {
+            get => _selectedLayout?.NormalExitSP ?? 1.0f;
+            set { if (_selectedLayout != null) _selectedLayout.NormalExitSP = value; OnPropertyChanged(); }
+        }
+        public float NormalExitMP
+        {
+            get => _selectedLayout?.NormalExitMP ?? 1.35f;
+            set { if (_selectedLayout != null) _selectedLayout.NormalExitMP = value; OnPropertyChanged(); }
         }
 
         // Commands
