@@ -11,7 +11,8 @@ namespace FiveMVehicleMetaEditorWPF.Core.Converters
         {
             if (value is bool boolValue)
                 return boolValue ? Visibility.Collapsed : Visibility.Visible;
-            return Visibility.Visible;
+            // Also handle null check for objects (e.g. SelectedVehicle)
+            return value != null ? Visibility.Collapsed : Visibility.Visible;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
