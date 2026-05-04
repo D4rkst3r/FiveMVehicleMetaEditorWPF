@@ -9,6 +9,7 @@ namespace FiveMVehicleMetaEditorWPF.Core.Services
 {
     /// <summary>
     /// Service for loading, parsing, and saving vehiclelayouts.meta files
+    /// Real GTA format: CVehicleMetadataMgr > AnimRateSets > Item type="CAnimRateSet" > Name
     /// </summary>
     public class MetaLayoutsService
     {
@@ -31,63 +32,33 @@ namespace FiveMVehicleMetaEditorWPF.Core.Services
 
                 var layoutList = new List<LayoutData>();
 
-                // Find all layout entries under <Layouts><Item> structure
-                var items = root.Descendants("Layouts")
+                // Real GTA vehiclelayouts.meta: <CVehicleMetadataMgr><AnimRateSets><Item type="CAnimRateSet"><Name>
+                var items = root.Descendants("AnimRateSets")
                     .Elements("Item")
                     .ToList();
 
+                // Fallback: try Layouts/Item (custom format)
+                if (items.Count == 0)
+                    items = root.Descendants("Layouts").Elements("Item").ToList();
+
+                // Fallback: any Item with a Name child
+                if (items.Count == 0)
+                    items = root.Descendants("Item")
+                        .Where(i => i.Element("Name") != null || i.Element("layoutName") != null)
+                        .ToList();
+
                 foreach (var item in items)
                 {
-                    var layoutNameElem = item.Element("layoutName");
-                    if (layoutNameElem?.Value == null || string.IsNullOrWhiteSpace(layoutNameElem.Value))
+                    var nameElem = item.Element("Name") ?? item.Element("layoutName");
+                    if (nameElem?.Value == null || string.IsNullOrWhiteSpace(nameElem.Value))
                         continue;
 
                     var layout = new LayoutData
                     {
-                        LayoutName = layoutNameElem.Value,
+                        LayoutName = nameElem.Value,
+                        Category = item.Attribute("type")?.Value ?? "AnimRateSet",
                         OriginalElement = item
                     };
-
-                    // Parse category if available
-                    var categoryElem = item.Element("category");
-                    if (categoryElem != null)
-                        layout.Category = categoryElem.Value;
-
-                    // Parse seats
-                    var seatsElem = item.Element("Seats");
-                    if (seatsElem != null)
-                    {
-                        foreach (var seat in seatsElem.Elements("Seat"))
-                        {
-                            if (int.TryParse(seat.Attribute("id")?.Value, out var seatId))
-                            {
-                                var seatName = seat.Attribute("name")?.Value ?? $"Seat_{seatId}";
-                                layout.AddSeat(seatId, seatName);
-                            }
-                        }
-                    }
-
-                    // Parse doors
-                    var doorsElem = item.Element("Doors");
-                    if (doorsElem != null)
-                    {
-                        foreach (var door in doorsElem.Elements("Door"))
-                        {
-                            if (int.TryParse(door.Attribute("id")?.Value, out var doorId))
-                            {
-                                var doorName = door.Attribute("name")?.Value ?? $"Door_{doorId}";
-                                layout.AddDoor(doorId, doorName);
-                            }
-                        }
-                    }
-
-                    // Parse roof/trunk/hood flags
-                    if (bool.TryParse(item.Element("HasRoof")?.Value, out var hasRoof))
-                        layout.HasRoof = hasRoof;
-                    if (bool.TryParse(item.Element("HasTrunk")?.Value, out var hasTrunk))
-                        layout.HasTrunk = hasTrunk;
-                    if (bool.TryParse(item.Element("HasHood")?.Value, out var hasHood))
-                        layout.HasHood = hasHood;
 
                     layoutList.Add(layout);
                 }
@@ -101,22 +72,24 @@ namespace FiveMVehicleMetaEditorWPF.Core.Services
         }
 
         /// <summary>
-        /// Save layout data back to XML file
+        /// Save layout data back to XML file (preserves original if OriginalElement is available)
         /// </summary>
         public (bool Success, string? Error) SaveLayoutsMeta(string filePath, List<LayoutData> layoutList)
         {
             try
             {
-                // Create backup before saving
                 var backupPath = filePath + ".backup";
                 if (File.Exists(filePath))
                     File.Copy(filePath, backupPath, true);
 
                 var doc = new XDocument(
                     new XDeclaration("1.0", "UTF-8", null),
-                    new XElement("CVehicleLayouts",
-                        new XElement("Layouts",
-                            layoutList.Select(l => CreateLayoutElement(l))
+                    new XElement("CVehicleMetadataMgr",
+                        new XElement("AnimRateSets",
+                            layoutList.Select(l => l.OriginalElement ?? new XElement("Item",
+                                new XAttribute("type", l.Category),
+                                new XElement("Name", l.LayoutName)
+                            ))
                         )
                     )
                 );
@@ -142,38 +115,6 @@ namespace FiveMVehicleMetaEditorWPF.Core.Services
                 .Where(l => l.LayoutName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                            l.Category.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
                 .ToList();
-        }
-
-        /// <summary>
-        /// Create XML element from LayoutData object
-        /// </summary>
-        private XElement CreateLayoutElement(LayoutData layout)
-        {
-            var seatsElement = new XElement("Seats",
-                layout.Seats.Select(s => new XElement("Seat",
-                    new XAttribute("id", s.Key),
-                    new XAttribute("name", s.Value)
-                ))
-            );
-
-            var doorsElement = new XElement("Doors",
-                layout.Doors.Select(d => new XElement("Door",
-                    new XAttribute("id", d.Key),
-                    new XAttribute("name", d.Value)
-                ))
-            );
-
-            var elem = new XElement("Item",
-                new XElement("layoutName", layout.LayoutName),
-                new XElement("category", layout.Category),
-                seatsElement,
-                doorsElement,
-                new XElement("HasRoof", layout.HasRoof),
-                new XElement("HasTrunk", layout.HasTrunk),
-                new XElement("HasHood", layout.HasHood)
-            );
-
-            return elem;
         }
     }
 }

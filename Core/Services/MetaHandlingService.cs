@@ -32,14 +32,15 @@ namespace FiveMVehicleMetaEditorWPF.Core.Services
 
                 var handlingList = new List<HandlingData>();
 
-                // Find all CHandlingData/Item elements
-                var items = root.Descendants("CHandlingData")
+                // Real GTA handling.meta: <CHandlingDataMgr><HandlingData><Item type="CHandlingData">
+                var items = root.Descendants("HandlingData")
                     .Elements("Item")
                     .ToList();
 
                 foreach (var item in items)
                 {
-                    var handlingNameElem = item.Element("handlingNameHash");
+                    // Real field name is "handlingName", not "handlingNameHash"
+                    var handlingNameElem = item.Element("handlingName") ?? item.Element("handlingNameHash");
                     if (handlingNameElem?.Value == null || string.IsNullOrWhiteSpace(handlingNameElem.Value))
                         continue;
 
@@ -110,7 +111,7 @@ namespace FiveMVehicleMetaEditorWPF.Core.Services
                 var doc = new XDocument(
                     new XDeclaration("1.0", "UTF-8", null),
                     new XElement("CHandlingDataMgr",
-                        new XElement("CHandlingData",
+                        new XElement("HandlingData",
                             handlingList.Select(h => CreateHandlingElement(h))
                         )
                     )
