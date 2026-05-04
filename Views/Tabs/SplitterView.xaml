@@ -14,20 +14,75 @@
         <!-- Toolbar -->
         <Border Grid.Row="0" Background="{DynamicResource SecondaryBgBrush}" Padding="10">
             <StackPanel Orientation="Horizontal">
-                <Button Command="{Binding LoadCommand}" Content="📂 Load" Width="80" Style="{StaticResource CommandButtonStyle}"/>
-                <Button Command="{Binding SaveCommand}" Content="💾 Save" Width="80" Style="{StaticResource CommandButtonStyle}"/>
-                <Button Command="{Binding ExportCommand}" Content="📤 Export" Width="80" Style="{StaticResource CommandButtonStyle}"/>
+                <Button Command="{Binding LoadCommand}" Content="📂 Load File" Width="100" Style="{StaticResource CommandButtonStyle}"/>
+                <Button Command="{Binding SplitCommand}" Content="✂️ Split Files" Width="100" Style="{StaticResource CommandButtonStyle}"/>
+                <Separator Width="10"/>
+                <TextBlock Text="{Binding VehicleCount}" Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center" FontWeight="Bold" FontSize="14"/>
+                <TextBlock Text=" vehicles" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
             </StackPanel>
         </Border>
 
         <!-- Content -->
-        <Border Grid.Row="1" Background="{DynamicResource SecondaryBgBrush}" Margin="10" Padding="15">
-            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                <TextBlock Text="✂️ Splitter" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" TextAlignment="Center"/>
-                <TextBlock Text="Split meta files into individual vehicles" FontSize="14" Foreground="{DynamicResource LightTextBrush}" TextAlignment="Center" Margin="0,10"/>
-                <TextBlock Text="Load a meta file to split into separate vehicle files" FontSize="11" Foreground="{DynamicResource GrayTextBrush}" TextAlignment="Center" Margin="0,20"/>
-            </StackPanel>
-        </Border>
+        <Grid Grid.Row="1" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Settings Panel -->
+            <Border Grid.Column="0" Background="{DynamicResource SecondaryBgBrush}" Padding="15" Margin="0,0,5,0">
+                <StackPanel>
+                    <TextBlock Text="✂️ Split Settings" FontSize="13" FontWeight="Bold"
+                               Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,15"/>
+
+                    <TextBlock Text="Source File:" Foreground="{DynamicResource GrayTextBrush}" FontSize="11" Margin="0,0,0,3"/>
+                    <TextBox Text="{Binding SourceFile}" IsReadOnly="True"
+                             Background="{DynamicResource DarkBgBrush}"
+                             Foreground="{DynamicResource LightTextBrush}"
+                             Padding="5" Margin="0,0,0,10"
+                             TextWrapping="Wrap"/>
+
+                    <TextBlock Text="Vehicles found:" Foreground="{DynamicResource GrayTextBrush}" FontSize="11"/>
+                    <TextBlock Text="{Binding VehicleCount}" Foreground="{DynamicResource PrimaryBrush}"
+                               FontSize="20" FontWeight="Bold" Margin="0,0,0,15"/>
+
+                    <TextBlock Text="Output Folder:" Foreground="{DynamicResource GrayTextBrush}" FontSize="11" Margin="0,0,0,3"/>
+                    <Grid Margin="0,0,0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Grid.Column="0" Text="{Binding OutputFolder}" IsReadOnly="True"
+                                 Background="{DynamicResource DarkBgBrush}"
+                                 Foreground="{DynamicResource LightTextBrush}"
+                                 Padding="5" TextWrapping="Wrap"/>
+                        <Button Grid.Column="1" Command="{Binding BrowseFolderCommand}"
+                                Content="📁" Width="30" Margin="5,0,0,0"
+                                Style="{StaticResource CommandButtonStyle}"/>
+                    </Grid>
+
+                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource GrayTextBrush}" FontSize="10" Margin="0,15,0,0"
+                               Text="Each vehicle will be saved as {ModelName}.meta in the output folder."/>
+                </StackPanel>
+            </Border>
+
+            <!-- Results Panel -->
+            <Border Grid.Column="1" Background="{DynamicResource SecondaryBgBrush}" Padding="15" Margin="5,0,0,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="📋 Split Results" FontSize="13" FontWeight="Bold"
+                               Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,10"/>
+                    <ListBox Grid.Row="1"
+                             ItemsSource="{Binding SplitResults}"
+                             Background="{DynamicResource DarkBgBrush}"
+                             Foreground="{DynamicResource LightTextBrush}"
+                             ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+                </Grid>
+            </Border>
+        </Grid>
 
         <!-- Status Bar -->
         <Border Grid.Row="2" Background="{StaticResource TertiaryBgBrush}" Padding="10">
@@ -35,5 +90,3 @@
         </Border>
     </Grid>
 </UserControl>
-
-

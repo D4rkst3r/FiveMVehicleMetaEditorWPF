@@ -14,20 +14,77 @@
         <!-- Toolbar -->
         <Border Grid.Row="0" Background="{DynamicResource SecondaryBgBrush}" Padding="10">
             <StackPanel Orientation="Horizontal">
-                <Button Command="{Binding LoadCommand}" Content="📂 Load" Width="80" Style="{StaticResource CommandButtonStyle}"/>
-                <Button Command="{Binding SaveCommand}" Content="💾 Save" Width="80" Style="{StaticResource CommandButtonStyle}"/>
-                <Button Command="{Binding ExportCommand}" Content="📤 Export" Width="80" Style="{StaticResource CommandButtonStyle}"/>
+                <Button Command="{Binding LoadCommand}" Content="📂 Add Files" Width="110" Style="{StaticResource CommandButtonStyle}"/>
+                <Button Command="{Binding MergeCommand}" Content="🔀 Merge &amp; Save" Width="130" Style="{StaticResource CommandButtonStyle}"/>
+                <Button Command="{Binding ClearCommand}" Content="🗑 Clear" Width="80" Style="{StaticResource CommandButtonStyle}"/>
+                <Separator Width="10"/>
+                <TextBlock Text="{Binding TotalVehicles}" Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center" FontWeight="Bold" FontSize="14"/>
+                <TextBlock Text=" total vehicles" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
             </StackPanel>
         </Border>
 
         <!-- Content -->
-        <Border Grid.Row="1" Background="{DynamicResource SecondaryBgBrush}" Margin="10" Padding="15">
-            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                <TextBlock Text="🔀 Merger" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" TextAlignment="Center"/>
-                <TextBlock Text="Merge multiple meta files" FontSize="14" Foreground="{DynamicResource LightTextBrush}" TextAlignment="Center" Margin="0,10"/>
-                <TextBlock Text="Load files to merge their contents together" FontSize="11" Foreground="{DynamicResource GrayTextBrush}" TextAlignment="Center" Margin="0,20"/>
-            </StackPanel>
-        </Border>
+        <Grid Grid.Row="1" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="250"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- File List -->
+            <Border Grid.Column="0" Background="{DynamicResource SecondaryBgBrush}" Padding="15" Margin="0,0,5,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" Text="📂 Files to Merge" FontSize="13" FontWeight="Bold"
+                               Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,10"/>
+                    <ListBox Grid.Row="1"
+                             ItemsSource="{Binding FilesToMerge}"
+                             SelectedItem="{Binding SelectedFile}"
+                             Background="{DynamicResource DarkBgBrush}"
+                             Foreground="{DynamicResource LightTextBrush}"
+                             ScrollViewer.VerticalScrollBarVisibility="Auto">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock Text="{Binding Converter={StaticResource FileNameConverter}}"
+                                               FontWeight="Bold" Foreground="{DynamicResource LightTextBrush}"/>
+                                    <TextBlock Text="{Binding}" FontSize="9"
+                                               Foreground="{DynamicResource GrayTextBrush}"
+                                               TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <Button Grid.Row="2" Command="{Binding RemoveFileCommand}"
+                            Content="Remove Selected" Margin="0,5,0,0"
+                            Style="{StaticResource CommandButtonStyle}"/>
+                </Grid>
+            </Border>
+
+            <!-- Info Panel -->
+            <Border Grid.Column="1" Background="{DynamicResource SecondaryBgBrush}" Padding="15" Margin="5,0,0,0">
+                <StackPanel>
+                    <TextBlock Text="ℹ️ How to use" FontSize="13" FontWeight="Bold"
+                               Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,15"/>
+                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource LightTextBrush}" FontSize="11" Margin="0,0,0,10"
+                               Text="1. Click 'Add Files' to select multiple vehicles.meta files"/>
+                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource LightTextBrush}" FontSize="11" Margin="0,0,0,10"
+                               Text="2. All vehicles will be merged (duplicates by model name are skipped)"/>
+                    <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource LightTextBrush}" FontSize="11" Margin="0,0,0,10"
+                               Text="3. Click 'Merge &amp; Save' to combine and save"/>
+                    <Separator Margin="0,10"/>
+                    <TextBlock Text="Total vehicles:" Foreground="{DynamicResource GrayTextBrush}" FontSize="11"/>
+                    <TextBlock Text="{Binding TotalVehicles}" Foreground="{DynamicResource PrimaryBrush}"
+                               FontSize="24" FontWeight="Bold"/>
+                    <TextBlock Text="Files selected:" Foreground="{DynamicResource GrayTextBrush}" FontSize="11" Margin="0,10,0,0"/>
+                    <TextBlock Text="{Binding FilesToMerge.Count}" Foreground="{DynamicResource PrimaryBrush}"
+                               FontSize="24" FontWeight="Bold"/>
+                </StackPanel>
+            </Border>
+        </Grid>
 
         <!-- Status Bar -->
         <Border Grid.Row="2" Background="{StaticResource TertiaryBgBrush}" Padding="10">
@@ -35,5 +92,3 @@
         </Border>
     </Grid>
 </UserControl>
-
-
