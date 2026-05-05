@@ -6,6 +6,11 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <Version>2.0.0</Version>
+    <AssemblyVersion>2.0.0.0</AssemblyVersion>
+    <FileVersion>2.0.0.0</FileVersion>
+<Copyright>2026 FiveM Vehicle Meta Editor</Copyright>
+    <Description>FiveM Vehicle Meta Editor — GTA5 vehicles.meta, handling.meta, carcols.meta editor</Description>
   </PropertyGroup>
 
   <ItemGroup>

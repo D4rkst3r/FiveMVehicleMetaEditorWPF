@@ -1,0 +1,144 @@
+<UserControl x:Class="FiveMVehicleMetaEditorWPF.Views.Tabs.DiffView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Toolbar -->
+        <Border Grid.Row="0" Background="{DynamicResource SecondaryBgBrush}" Padding="10,8">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Diff Tool" FontSize="14" FontWeight="Bold"
+                           Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center" Margin="0,0,16,0"/>
+                <Button Command="{Binding SelectFileACommand}" Content="Select File A" Width="110" Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Select the first vehicles.meta to compare"/>
+                <TextBlock Text="{Binding FileAName}" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="8,0,16,0" FontSize="11"/>
+                <Button Command="{Binding SelectFileBCommand}" Content="Select File B" Width="110" Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Select the second vehicles.meta to compare"/>
+                <TextBlock Text="{Binding FileBName}" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="8,0,16,0" FontSize="11"/>
+                <Button Command="{Binding RunDiffCommand}" Content="Compare" Width="90" Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Run the comparison"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Stats row -->
+        <Border Grid.Row="1" Background="#1A2233" Padding="12,6">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="File A:" Foreground="{DynamicResource GrayTextBrush}" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding TotalA}" Foreground="{DynamicResource PrimaryBrush}" FontWeight="Bold" VerticalAlignment="Center" Margin="4,0,16,0"/>
+                <TextBlock Text="File B:" Foreground="{DynamicResource GrayTextBrush}" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding TotalB}" Foreground="{DynamicResource PrimaryBrush}" FontWeight="Bold" VerticalAlignment="Center" Margin="4,0,16,0"/>
+                <TextBlock Text="Only in A:" Foreground="{DynamicResource GrayTextBrush}" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding OnlyInA.Count}" Foreground="#FF6666" FontWeight="Bold" VerticalAlignment="Center" Margin="4,0,16,0"/>
+                <TextBlock Text="Only in B:" Foreground="{DynamicResource GrayTextBrush}" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding OnlyInB.Count}" Foreground="#66FF66" FontWeight="Bold" VerticalAlignment="Center" Margin="4,0,16,0"/>
+                <TextBlock Text="Changed:" Foreground="{DynamicResource GrayTextBrush}" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding ChangedInBoth.Count}" Foreground="#FFB84D" FontWeight="Bold" VerticalAlignment="Center" Margin="4,0,16,0"/>
+                <TextBlock Text="Identical:" Foreground="{DynamicResource GrayTextBrush}" VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding SameInBoth.Count}" Foreground="{DynamicResource GrayTextBrush}" FontWeight="Bold" VerticalAlignment="Center" Margin="4,0,0,0"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Results Grid -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="2*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Only in A (red) -->
+            <Border Grid.Column="0" Background="{DynamicResource SecondaryBgBrush}" Margin="5">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Border Grid.Row="0" Background="#3B1010" Padding="8,6">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Only in File A" FontWeight="Bold" Foreground="#FF6666" FontSize="11"/>
+                            <TextBlock Text=" (" Foreground="{DynamicResource GrayTextBrush}" FontSize="11"/>
+                            <TextBlock Text="{Binding OnlyInA.Count}" Foreground="#FF6666" FontSize="11" FontWeight="Bold"/>
+                            <TextBlock Text=")" Foreground="{DynamicResource GrayTextBrush}" FontSize="11"/>
+                        </StackPanel>
+                    </Border>
+                    <ListBox Grid.Row="1" ItemsSource="{Binding OnlyInA}"
+                             Background="{DynamicResource DarkBgBrush}" Foreground="#FF9999"
+                             ScrollViewer.VerticalScrollBarVisibility="Auto">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" FontSize="11" Padding="2"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Border>
+
+            <!-- Only in B (green) -->
+            <Border Grid.Column="1" Background="{DynamicResource SecondaryBgBrush}" Margin="5">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Border Grid.Row="0" Background="#103B10" Padding="8,6">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Only in File B" FontWeight="Bold" Foreground="#66FF66" FontSize="11"/>
+                            <TextBlock Text=" (" Foreground="{DynamicResource GrayTextBrush}" FontSize="11"/>
+                            <TextBlock Text="{Binding OnlyInB.Count}" Foreground="#66FF66" FontSize="11" FontWeight="Bold"/>
+                            <TextBlock Text=")" Foreground="{DynamicResource GrayTextBrush}" FontSize="11"/>
+                        </StackPanel>
+                    </Border>
+                    <ListBox Grid.Row="1" ItemsSource="{Binding OnlyInB}"
+                             Background="{DynamicResource DarkBgBrush}" Foreground="#99FF99"
+                             ScrollViewer.VerticalScrollBarVisibility="Auto">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" FontSize="11" Padding="2"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Border>
+
+            <!-- Changed (orange) -->
+            <Border Grid.Column="2" Background="{DynamicResource SecondaryBgBrush}" Margin="5">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Border Grid.Row="0" Background="#2A1A00" Padding="8,6">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Changed in Both" FontWeight="Bold" Foreground="#FFB84D" FontSize="11"/>
+                            <TextBlock Text=" (" Foreground="{DynamicResource GrayTextBrush}" FontSize="11"/>
+                            <TextBlock Text="{Binding ChangedInBoth.Count}" Foreground="#FFB84D" FontSize="11" FontWeight="Bold"/>
+                            <TextBlock Text=")" Foreground="{DynamicResource GrayTextBrush}" FontSize="11"/>
+                        </StackPanel>
+                    </Border>
+                    <ListBox Grid.Row="1" ItemsSource="{Binding ChangedInBoth}"
+                             Background="{DynamicResource DarkBgBrush}" Foreground="#FFD088"
+                             ScrollViewer.VerticalScrollBarVisibility="Auto">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" FontSize="11" Padding="2" TextWrapping="Wrap"/>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Status Bar -->
+        <Border Grid.Row="3" Background="{StaticResource TertiaryBgBrush}" Padding="10">
+            <TextBlock Text="{Binding StatusMessage}" Foreground="{DynamicResource GrayTextBrush}"/>
+        </Border>
+    </Grid>
+</UserControl>

@@ -145,7 +145,17 @@ namespace FiveMVehicleMetaEditorWPF
 
                     case Key.F:  // Ctrl+F - Find/Search
                         _viewModel?.ShowTab("browser");
-                        ShowNotification("🔍 Search Browser opened", 1500);
+                        ShowNotification("Search Browser opened", 1500);
+                        e.Handled = true;
+                        break;
+
+                    case Key.Z:  // Ctrl+Z - Undo (forwarded to Vehicles tab ViewModel)
+                        ForwardUndoRedo(undo: true);
+                        e.Handled = true;
+                        break;
+
+                    case Key.Y:  // Ctrl+Y - Redo
+                        ForwardUndoRedo(undo: false);
                         e.Handled = true;
                         break;
                 }
@@ -158,21 +168,33 @@ namespace FiveMVehicleMetaEditorWPF
             }
         }
 
+        private void ForwardUndoRedo(bool undo)
+        {
+            // Forward Ctrl+Z / Ctrl+Y to the Vehicles tab ViewModel if it's active
+            if (VehiclesTabView?.DataContext is ViewModels.TabViewModels.VehiclesViewModel vm)
+            {
+                var cmd = undo ? vm.UndoCommand : vm.RedoCommand;
+                if (cmd.CanExecute(null))
+                {
+                    cmd.Execute(null);
+                    ShowNotification(undo ? "Undo" : "Redo", 1200);
+                }
+            }
+        }
+
         private void ShowShortcutsDialog()
         {
             MessageBox.Show(
-                "⌨️ KEYBOARD SHORTCUTS\n\n" +
+                "KEYBOARD SHORTCUTS\n\n" +
                 "Ctrl+S ......... Save current file\n" +
                 "Ctrl+E ......... Export as profile\n" +
                 "Ctrl+I ......... Import/Load profile\n" +
                 "Ctrl+F ......... Open search browser\n" +
+                "Ctrl+Z ......... Undo (Vehicles tab)\n" +
+                "Ctrl+Y ......... Redo (Vehicles tab)\n" +
                 "F1 ............. Show this dialog\n\n" +
-                "📋 NAVIGATION\n" +
-                "Click any tab in the left sidebar to switch views\n" +
-                "Use mouse scroll to navigate if tabs overflow\n\n" +
-                "💾 FILE MANAGEMENT\n" +
-                "Auto-saves window size and position\n" +
-                "Recent files tracked automatically",
+                "DRAG AND DROP\n" +
+                "Drop vehicles.meta or handling.meta onto the respective tab",
                 "FiveM Vehicle Meta Editor - Shortcuts",
                 MessageBoxButton.OK,
                 MessageBoxImage.Information);

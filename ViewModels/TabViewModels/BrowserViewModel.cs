@@ -73,6 +73,11 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
         public ObservableCollection<RecentFileItem> RecentFiles { get; } = new();
         public ObservableCollection<string> Vehicles { get; } = new();
 
+        // Callbacks wired by BrowserView.xaml.cs to push data into the real tab ViewModels
+        public Action<string>? OnVehiclesFileLoaded;
+        public Action<string>? OnHandlingFileLoaded;
+        public Action<string>? OnLayoutsFileLoaded;
+
         public ICommand LoadVehiclesCommand { get; }
         public ICommand LoadHandlingCommand { get; }
         public ICommand LoadLayoutsCommand { get; }
@@ -198,6 +203,7 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
                     SelectedFile = filePath;
                     AddToRecentFiles(filePath);
                     ShowSuccess($"Loaded {vehicles.Count} vehicles");
+                    OnVehiclesFileLoaded?.Invoke(filePath);   // push into VehiclesTab
                     MainVM?.NavigateTo("vehicles");
                 }
                 else
@@ -235,6 +241,7 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
                     SelectedFile = filePath;
                     AddToRecentFiles(filePath);
                     ShowSuccess($"Loaded {handlingData.Count} handling entries");
+                    OnHandlingFileLoaded?.Invoke(filePath);    // push into HandlingTab
                     MainVM?.NavigateTo("handling");
                 }
                 else
@@ -273,6 +280,7 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
                     SelectedFile = filePath;
                     AddToRecentFiles(filePath);
                     ShowSuccess($"Loaded {layouts.Count} layouts");
+                    OnLayoutsFileLoaded?.Invoke(filePath);     // push into LayoutsTab
                     MainVM?.NavigateTo("layouts");
                 }
                 else
@@ -339,6 +347,7 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
                     SelectedFile = filePath;
                     AddToRecentFiles(filePath);
                     ShowSuccess($"Loaded {vehicles.Count} vehicles");
+                    OnVehiclesFileLoaded?.Invoke(filePath);
                     MainVM?.NavigateTo("vehicles");
                 }
                 else
@@ -372,6 +381,7 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
                     SelectedFile = filePath;
                     AddToRecentFiles(filePath);
                     ShowSuccess($"Loaded {handlingData.Count} handling entries");
+                    OnHandlingFileLoaded?.Invoke(filePath);
                     MainVM?.NavigateTo("handling");
                 }
                 else
@@ -406,6 +416,7 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
                     SelectedFile = filePath;
                     AddToRecentFiles(filePath);
                     ShowSuccess($"Loaded {layouts.Count} layouts");
+                    OnLayoutsFileLoaded?.Invoke(filePath);
                     MainVM?.NavigateTo("layouts");
                 }
                 else

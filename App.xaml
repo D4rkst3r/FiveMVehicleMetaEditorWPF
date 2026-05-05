@@ -10,6 +10,23 @@
         <conv:BoolToVisibilityConverter x:Key="BoolToVisConverter"/>
         <conv:BoolToVisibilityInverseConverter x:Key="BoolToVisInverseConverter"/>
         <conv:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
+        <conv:ListContainsConverter x:Key="ListContainsConverter"/>
+
+        <!-- Auto-Validation: red border on invalid input -->
+        <Style x:Key="ValidatedTextBoxStyle" TargetType="TextBox">
+            <Setter Property="Background" Value="{DynamicResource DarkBgBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource LightTextBrush}"/>
+            <Setter Property="Padding" Value="5,3"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#444"/>
+            <Style.Triggers>
+                <Trigger Property="Validation.HasError" Value="True">
+                    <Setter Property="BorderBrush" Value="#FF4444"/>
+                    <Setter Property="BorderThickness" Value="2"/>
+                    <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)[0].ErrorContent}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
 
         <!-- Modern FiveM Theme - Orange & Cyan (Dynamic for live theme changes) -->
         <SolidColorBrush x:Key="PrimaryBrush" Color="#FF9500" />

@@ -16,15 +16,23 @@
         </Grid.ColumnDefinitions>
 
         <!-- Toolbar -->
-        <Border Grid.Row="0" Grid.ColumnSpan="2" Background="{DynamicResource SecondaryBgBrush}" Padding="10">
-            <StackPanel Orientation="Horizontal">
-                <Button Command="{Binding LoadCommand}" Content="📂 Load" Width="80" Style="{StaticResource CommandButtonStyle}"/>
-                <Button Command="{Binding SaveCommand}" Content="💾 Save" Width="80" Style="{StaticResource CommandButtonStyle}"/>
-                <Button Command="{Binding ExportCommand}" Content="📤 Export" Width="80" Style="{StaticResource CommandButtonStyle}"/>
-                <Separator Width="10"/>
-                <TextBlock Text="{Binding CarcolEntries.Count}" Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center" FontWeight="Bold" FontSize="14"/>
+        <Border Grid.Row="0" Grid.ColumnSpan="2" Background="{DynamicResource SecondaryBgBrush}" Padding="8,6">
+            <WrapPanel Orientation="Horizontal">
+                <Button Command="{Binding LoadCommand}" Content="Load" Width="65" Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Load carcols.meta"/>
+                <Button Command="{Binding SaveCommand}" Content="Save" Width="65" Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Save carcols.meta (auto-backup created)"/>
+                <Button Command="{Binding ExportCommand}" Content="Export" Width="65" Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Export as JSON"/>
+                <Separator Width="8"/>
+                <Button Command="{Binding AddKitCommand}" Content="+ Add Kit" Width="80" Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Add a new empty kit with auto-incremented ID"/>
+                <Button Command="{Binding DeleteKitCommand}" Content="Delete Kit" Width="80" Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Delete the selected kit"/>
+                <Separator Width="8"/>
+                <TextBlock Text="{Binding CarcolEntries.Count}" Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center" FontWeight="Bold" FontSize="13"/>
                 <TextBlock Text=" kits" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
-            </StackPanel>
+            </WrapPanel>
         </Border>
 
         <!-- Left: Kit List -->
@@ -34,7 +42,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Text="🚨 Mod Kits" FontSize="12" FontWeight="Bold"
+                <TextBlock Grid.Row="0" Text="Mod Kits" FontSize="12" FontWeight="Bold"
                            Foreground="{DynamicResource PrimaryBrush}" Margin="8,8,8,5"/>
                 <ListBox Grid.Row="1"
                          ItemsSource="{Binding CarcolEntries}"
@@ -51,65 +59,101 @@
             </Grid>
         </Border>
 
-        <!-- Right: Kit Details -->
-        <Border Grid.Row="1" Grid.Column="1" Background="{DynamicResource SecondaryBgBrush}" Margin="5" Padding="15">
+        <!-- Right: Kit Details + Edit -->
+        <Border Grid.Row="1" Grid.Column="1" Background="{DynamicResource SecondaryBgBrush}" Margin="5" Padding="12">
             <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-
                 <!-- Empty state -->
-                <StackPanel Grid.Row="0" Visibility="{Binding SelectedEntry, Converter={StaticResource BoolToVisInverseConverter}}">
-                    <TextBlock Text="🚨 Carcols Editor" FontSize="14" FontWeight="Bold"
+                <StackPanel Visibility="{Binding SelectedEntry, Converter={StaticResource BoolToVisInverseConverter}}">
+                    <TextBlock Text="Carcols Editor" FontSize="14" FontWeight="Bold"
                                Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,10"/>
-                    <TextBlock Text="Select a mod kit from the list to view its details."
+                    <TextBlock Text="Select a mod kit from the list to view and edit its details."
                                FontSize="11" Foreground="{DynamicResource GrayTextBrush}" TextWrapping="Wrap"/>
+                    <TextBlock Text="Use + Add Kit to create a new kit."
+                               FontSize="11" Foreground="{DynamicResource GrayTextBrush}" Margin="0,4,0,0"/>
                 </StackPanel>
 
-                <!-- Kit details -->
-                <ScrollViewer Grid.Row="0" Grid.RowSpan="2"
-                              Visibility="{Binding SelectedEntry, Converter={StaticResource BoolToVisConverter}}">
+                <!-- Kit details and edit panel -->
+                <ScrollViewer Visibility="{Binding SelectedEntry, Converter={StaticResource BoolToVisConverter}}">
                     <StackPanel>
-                        <!-- Kit name header -->
+                        <!-- Header -->
                         <TextBlock Text="{Binding SelectedEntry}" FontSize="16" FontWeight="Bold"
-                                   Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,12" TextWrapping="Wrap"/>
+                                   Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,10" TextWrapping="Wrap"/>
 
-                        <!-- Info grid -->
-                        <Border Background="{DynamicResource DarkBgBrush}" CornerRadius="4" Padding="10" Margin="0,0,0,12">
+                        <!-- Edit fields -->
+                        <Border Background="{DynamicResource DarkBgBrush}" CornerRadius="4" Padding="10" Margin="0,0,0,10">
+                            <StackPanel>
+                                <TextBlock Text="Edit Kit" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,8"/>
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="80"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
+                                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding EditKitName, UpdateSourceTrigger=PropertyChanged}"
+                                             Background="{DynamicResource SecondaryBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                             Padding="5,3" BorderThickness="1" BorderBrush="#555" Margin="0,3"
+                                             ToolTip="Kit name (must be unique across the file)"/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="ID:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding EditKitId, UpdateSourceTrigger=PropertyChanged}"
+                                             Background="{DynamicResource SecondaryBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                             Padding="5,3" BorderThickness="1" BorderBrush="#555" Margin="0,3"
+                                             ToolTip="Numeric kit ID (must be unique, auto-incremented when adding)"/>
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Type:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
+                                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding EditKitType, UpdateSourceTrigger=PropertyChanged}"
+                                             Background="{DynamicResource SecondaryBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                             Padding="5,3" BorderThickness="1" BorderBrush="#555" Margin="0,3"
+                                             ToolTip="KIT_TYPE_STANDARD or KIT_TYPE_REPLACED"/>
+
+                                    <StackPanel Grid.Row="3" Grid.Column="1" Orientation="Horizontal" Margin="0,6,0,0">
+                                        <Button Command="{Binding ApplyKitChangesCommand}" Content="Apply Changes"
+                                                Width="110" Style="{StaticResource CommandButtonStyle}"
+                                                ToolTip="Apply ID and type changes to the XML"/>
+                                        <Button Command="{Binding RenameKitCommand}" Content="Rename"
+                                                Width="70" Margin="8,0,0,0" Style="{StaticResource CommandButtonStyle}"
+                                                ToolTip="Rename kit using the Name field above"/>
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Stats summary -->
+                        <Border Background="{DynamicResource DarkBgBrush}" CornerRadius="4" Padding="10" Margin="0,0,0,10">
                             <Grid>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="110"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
-
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Kit ID:" Foreground="{DynamicResource GrayTextBrush}" FontSize="11" Margin="0,2"/>
-                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding KitId}" Foreground="{DynamicResource LightTextBrush}" FontSize="11" Margin="0,2"/>
-
-                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Kit Type:" Foreground="{DynamicResource GrayTextBrush}" FontSize="11" Margin="0,2"/>
-                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding KitType}" Foreground="{DynamicResource LightTextBrush}" FontSize="11" Margin="0,2"/>
-
-                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Visible Mods:" Foreground="{DynamicResource GrayTextBrush}" FontSize="11" Margin="0,2"/>
-                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding VisibleModCount}" Foreground="{DynamicResource PrimaryBrush}" FontWeight="Bold" FontSize="11" Margin="0,2"/>
-
-                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Stat Mods:" Foreground="{DynamicResource GrayTextBrush}" FontSize="11" Margin="0,2"/>
-                                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding StatModCount}" Foreground="{DynamicResource PrimaryBrush}" FontWeight="Bold" FontSize="11" Margin="0,2"/>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Visible Mods:" Foreground="{DynamicResource GrayTextBrush}" FontSize="11" Margin="0,2"/>
+                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding VisibleModCount}" Foreground="{DynamicResource PrimaryBrush}" FontWeight="Bold" FontSize="11" Margin="0,2"/>
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Stat Mods:" Foreground="{DynamicResource GrayTextBrush}" FontSize="11" Margin="0,2"/>
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding StatModCount}" Foreground="{DynamicResource PrimaryBrush}" FontWeight="Bold" FontSize="11" Margin="0,2"/>
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Link Mods:" Foreground="{DynamicResource GrayTextBrush}" FontSize="11" Margin="0,2"/>
+                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding LinkModCount}" Foreground="{DynamicResource PrimaryBrush}" FontWeight="Bold" FontSize="11" Margin="0,2"/>
                             </Grid>
                         </Border>
 
                         <!-- Visible Mods list -->
                         <TextBlock Text="Visible Mods" FontSize="12" FontWeight="Bold"
-                                   Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,6"/>
+                                   Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,5"/>
                         <ListBox ItemsSource="{Binding VisibleMods}"
                                  Background="{DynamicResource DarkBgBrush}"
                                  Foreground="{DynamicResource LightTextBrush}"
-                                 MaxHeight="300"
+                                 MaxHeight="250"
                                  ScrollViewer.VerticalScrollBarVisibility="Auto">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>

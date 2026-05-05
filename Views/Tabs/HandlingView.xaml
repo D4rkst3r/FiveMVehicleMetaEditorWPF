@@ -3,7 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             mc:Ignorable="d">
+             mc:Ignorable="d"
+             AllowDrop="True"
+             Drop="OnFileDrop" DragOver="OnDragOver">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -18,9 +20,15 @@
         <!-- Toolbar -->
         <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Background="{DynamicResource SecondaryBgBrush}" Padding="10">
             <StackPanel Orientation="Horizontal">
-                <Button Command="{Binding LoadCommand}" Content="📂 Load" Width="80" Style="{StaticResource CommandButtonStyle}"/>
-                <Button Command="{Binding SaveCommand}" Content="💾 Save" Width="80" Style="{StaticResource CommandButtonStyle}"/>
-                <Button Command="{Binding ExportCommand}" Content="📤 Export" Width="80" Style="{StaticResource CommandButtonStyle}"/>
+                <Button Command="{Binding LoadCommand}" Content="Load" Width="70" Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Load handling.meta"/>
+                <Button Command="{Binding SaveCommand}" Content="Save" Width="70" Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Save handling.meta (auto-backup created)"/>
+                <Button Command="{Binding ExportCommand}" Content="Export" Width="70" Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Export as JSON"/>
+                <Separator Width="8"/>
+                <TextBlock Text="{Binding HandlingEntries.Count}" Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center" FontWeight="Bold"/>
+                <TextBlock Text=" entries" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="2,0,0,0"/>
             </StackPanel>
         </Border>
 
@@ -31,12 +39,11 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <!-- Search -->
                 <TextBox Grid.Row="0"
-                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                         Text="{Binding SearchText2, UpdateSourceTrigger=PropertyChanged}"
                          Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
-                         Padding="8" Margin="5" Height="30"/>
-                <!-- Handling List -->
+                         Padding="8" Margin="5" Height="30"
+                         ToolTip="Search by handling name"/>
                 <ListBox Grid.Row="1"
                          ItemsSource="{Binding HandlingEntries}"
                          SelectedItem="{Binding SelectedHandling}"
@@ -53,132 +60,247 @@
         </Border>
 
         <!-- Right: Handling Properties Editor -->
-        <Border Grid.Row="1" Grid.Column="1" Background="{DynamicResource SecondaryBgBrush}" Margin="5" Padding="15">
+        <Border Grid.Row="1" Grid.Column="1" Background="{DynamicResource SecondaryBgBrush}" Margin="5" Padding="12">
             <ScrollViewer>
                 <StackPanel>
                     <TextBlock Text="Handling Parameters" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}"/>
 
-                    <StackPanel Visibility="{Binding SelectedHandling, Converter={StaticResource BoolToVisConverter}}">
-                        <!-- Mass & Dimensions Section -->
-                        <TextBlock Text="Mass &amp; Dimensions" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,15,0,10"/>
-
-                        <Grid ColumnDefinitions="80,*,40" RowDefinitions="Auto,Auto,Auto,Auto" VerticalAlignment="Top">
-                            <TextBlock Text="Mass:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
-                            <Slider Grid.Column="1" Value="{Binding Mass}" Minimum="100" Maximum="20000" TickFrequency="100" IsSnapToTickEnabled="False" Margin="10,0"/>
-                            <TextBlock Grid.Column="2" Text="{Binding Mass, StringFormat=F0}" Foreground="{DynamicResource GrayTextBrush}"/>
-
-                            <TextBlock Grid.Row="1" Text="Dim X:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
-                            <Slider Grid.Row="1" Grid.Column="1" Value="{Binding DimensionsX}" Minimum="0.1" Maximum="10" TickFrequency="0.1" IsSnapToTickEnabled="False" Margin="10,0"/>
-                            <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding DimensionsX, StringFormat=F2}" Foreground="{DynamicResource GrayTextBrush}"/>
-
-                            <TextBlock Grid.Row="2" Text="Dim Y:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
-                            <Slider Grid.Row="2" Grid.Column="1" Value="{Binding DimensionsY}" Minimum="0.1" Maximum="10" TickFrequency="0.1" IsSnapToTickEnabled="False" Margin="10,0"/>
-                            <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding DimensionsY, StringFormat=F2}" Foreground="{DynamicResource GrayTextBrush}"/>
-
-                            <TextBlock Grid.Row="3" Text="Dim Z:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
-                            <Slider Grid.Row="3" Grid.Column="1" Value="{Binding DimensionsZ}" Minimum="0.1" Maximum="10" TickFrequency="0.1" IsSnapToTickEnabled="False" Margin="10,0"/>
-                            <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding DimensionsZ, StringFormat=F2}" Foreground="{DynamicResource GrayTextBrush}"/>
-                        </Grid>
-
-                        <!-- Transmission Section -->
-                        <TextBlock Text="Transmission" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,15,0,10"/>
-
-                        <Grid ColumnDefinitions="80,*,40" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
-                            <TextBlock Text="Accel X:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
-                            <Slider Grid.Column="1" Value="{Binding AccelerationX}" Minimum="0.1" Maximum="1.0" TickFrequency="0.05" IsSnapToTickEnabled="False" Margin="10,0"/>
-                            <TextBlock Grid.Column="2" Text="{Binding AccelerationX, StringFormat=F3}" Foreground="{DynamicResource GrayTextBrush}"/>
-
-                            <TextBlock Grid.Row="1" Text="Accel Y:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
-                            <Slider Grid.Row="1" Grid.Column="1" Value="{Binding AccelerationY}" Minimum="-1.0" Maximum="1.0" TickFrequency="0.05" IsSnapToTickEnabled="False" Margin="10,0"/>
-                            <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding AccelerationY, StringFormat=F3}" Foreground="{DynamicResource GrayTextBrush}"/>
-
-                            <TextBlock Grid.Row="2" Text="Accel Z:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
-                            <Slider Grid.Row="2" Grid.Column="1" Value="{Binding AccelerationZ}" Minimum="-1.0" Maximum="1.0" TickFrequency="0.05" IsSnapToTickEnabled="False" Margin="10,0"/>
-                            <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding AccelerationZ, StringFormat=F3}" Foreground="{DynamicResource GrayTextBrush}"/>
-
-                            <TextBlock Grid.Row="3" Text="Gears:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
-                            <Slider Grid.Row="3" Grid.Column="1" Value="{Binding NumberOfGears}" Minimum="3" Maximum="12" TickFrequency="1" IsSnapToTickEnabled="False" Margin="10,0"/>
-                            <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding NumberOfGears, StringFormat=F0}" Foreground="{DynamicResource GrayTextBrush}"/>
-
-                            <TextBlock Grid.Row="4" Text="Top Speed:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
-                            <Slider Grid.Row="4" Grid.Column="1" Value="{Binding TopSpeed}" Minimum="10" Maximum="500" TickFrequency="10" IsSnapToTickEnabled="False" Margin="10,0"/>
-                            <TextBlock Grid.Row="4" Grid.Column="2" Text="{Binding TopSpeed, StringFormat=F0}" Foreground="{DynamicResource GrayTextBrush}"/>
-                        </Grid>
-
-                        <!-- Steering & Braking Section -->
-                        <TextBlock Text="Steering &amp; Braking" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,15,0,10"/>
-
-                        <Grid ColumnDefinitions="80,*,40" RowDefinitions="Auto,Auto,Auto,Auto">
-                            <TextBlock Text="Steer Lock:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
-                            <Slider Grid.Column="1" Value="{Binding SteeringLock}" Minimum="5" Maximum="90" TickFrequency="5" IsSnapToTickEnabled="False" Margin="10,0"/>
-                            <TextBlock Grid.Column="2" Text="{Binding SteeringLock, StringFormat=F1}" Foreground="{DynamicResource GrayTextBrush}"/>
-
-                            <TextBlock Grid.Row="1" Text="Steer Bias:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
-                            <Slider Grid.Row="1" Grid.Column="1" Value="{Binding SteeringBias}" Minimum="-1.0" Maximum="1.0" TickFrequency="0.1" IsSnapToTickEnabled="False" Margin="10,0"/>
-                            <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding SteeringBias, StringFormat=F2}" Foreground="{DynamicResource GrayTextBrush}"/>
-
-                            <TextBlock Grid.Row="2" Text="Brake Force:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
-                            <Slider Grid.Row="2" Grid.Column="1" Value="{Binding BrakeForce}" Minimum="0.1" Maximum="5" TickFrequency="0.1" IsSnapToTickEnabled="False" Margin="10,0"/>
-                            <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding BrakeForce, StringFormat=F2}" Foreground="{DynamicResource GrayTextBrush}"/>
-
-                            <TextBlock Grid.Row="3" Text="Brake Bias:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
-                            <Slider Grid.Row="3" Grid.Column="1" Value="{Binding BrakeBias}" Minimum="0" Maximum="1" TickFrequency="0.05" IsSnapToTickEnabled="False" Margin="10,0"/>
-                            <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding BrakeBias, StringFormat=F2}" Foreground="{DynamicResource GrayTextBrush}"/>
-                        </Grid>
-
-                        <!-- Suspension Section -->
-                        <TextBlock Text="Suspension" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,15,0,10"/>
-
-                        <Grid ColumnDefinitions="80,*,40" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
-                            <TextBlock Text="Height:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
-                            <Slider Grid.Column="1" Value="{Binding SuspensionHeight}" Minimum="-1" Maximum="1" TickFrequency="0.05" IsSnapToTickEnabled="False" Margin="10,0"/>
-                            <TextBlock Grid.Column="2" Text="{Binding SuspensionHeight, StringFormat=F2}" Foreground="{DynamicResource GrayTextBrush}"/>
-
-                            <TextBlock Grid.Row="1" Text="Lower Lim:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
-                            <Slider Grid.Row="1" Grid.Column="1" Value="{Binding SuspensionLowerLimit}" Minimum="-0.5" Maximum="0" TickFrequency="0.05" IsSnapToTickEnabled="False" Margin="10,0"/>
-                            <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding SuspensionLowerLimit, StringFormat=F2}" Foreground="{DynamicResource GrayTextBrush}"/>
-
-                            <TextBlock Grid.Row="2" Text="Upper Lim:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
-                            <Slider Grid.Row="2" Grid.Column="1" Value="{Binding SuspensionUpperLimit}" Minimum="0" Maximum="0.5" TickFrequency="0.05" IsSnapToTickEnabled="False" Margin="10,0"/>
-                            <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding SuspensionUpperLimit, StringFormat=F2}" Foreground="{DynamicResource GrayTextBrush}"/>
-
-                            <TextBlock Grid.Row="3" Text="Stiffness:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
-                            <Slider Grid.Row="3" Grid.Column="1" Value="{Binding SuspensionStiffness}" Minimum="0.1" Maximum="5.0" TickFrequency="0.1" IsSnapToTickEnabled="False" Margin="10,0"/>
-                            <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding SuspensionStiffness, StringFormat=F2}" Foreground="{DynamicResource GrayTextBrush}"/>
-
-                            <TextBlock Grid.Row="4" Text="Damping:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
-                            <Slider Grid.Row="4" Grid.Column="1" Value="{Binding SuspensionDamping}" Minimum="0.0" Maximum="1.0" TickFrequency="0.05" IsSnapToTickEnabled="False" Margin="10,0"/>
-                            <TextBlock Grid.Row="4" Grid.Column="2" Text="{Binding SuspensionDamping, StringFormat=F2}" Foreground="{DynamicResource GrayTextBrush}"/>
-                        </Grid>
-
-                        <!-- Traction & Advanced Section -->
-                        <TextBlock Text="Traction &amp; Advanced" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,15,0,10"/>
-
-                        <Grid ColumnDefinitions="80,*,40" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
-                            <TextBlock Text="Traction Max:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
-                            <Slider Grid.Column="1" Value="{Binding TractionCurveMax}" Minimum="0.1" Maximum="5" TickFrequency="0.1" IsSnapToTickEnabled="False" Margin="10,0"/>
-                            <TextBlock Grid.Column="2" Text="{Binding TractionCurveMax, StringFormat=F2}" Foreground="{DynamicResource GrayTextBrush}"/>
-
-                            <TextBlock Grid.Row="1" Text="Traction Min:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
-                            <Slider Grid.Row="1" Grid.Column="1" Value="{Binding TractionCurveMin}" Minimum="0.1" Maximum="5" TickFrequency="0.1" IsSnapToTickEnabled="False" Margin="10,0"/>
-                            <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding TractionCurveMin, StringFormat=F2}" Foreground="{DynamicResource GrayTextBrush}"/>
-
-                            <TextBlock Grid.Row="2" Text="Downforce:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
-                            <Slider Grid.Row="2" Grid.Column="1" Value="{Binding Downforce}" Minimum="0.0" Maximum="1.0" TickFrequency="0.05" IsSnapToTickEnabled="False" Margin="10,0"/>
-                            <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding Downforce, StringFormat=F2}" Foreground="{DynamicResource GrayTextBrush}"/>
-
-                            <TextBlock Grid.Row="3" Text="Roll Front:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
-                            <Slider Grid.Row="3" Grid.Column="1" Value="{Binding RollCentreHeightFront}" Minimum="0.0" Maximum="1.0" TickFrequency="0.05" IsSnapToTickEnabled="False" Margin="10,0"/>
-                            <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding RollCentreHeightFront, StringFormat=F2}" Foreground="{DynamicResource GrayTextBrush}"/>
-
-                            <TextBlock Grid.Row="4" Text="Roll Rear:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
-                            <Slider Grid.Row="4" Grid.Column="1" Value="{Binding RollCentreHeightRear}" Minimum="0.0" Maximum="1.0" TickFrequency="0.05" IsSnapToTickEnabled="False" Margin="10,0"/>
-                            <TextBlock Grid.Row="4" Grid.Column="2" Text="{Binding RollCentreHeightRear, StringFormat=F2}" Foreground="{DynamicResource GrayTextBrush}"/>
-                        </Grid>
+                    <!-- No selection -->
+                    <StackPanel Visibility="{Binding SelectedHandling, Converter={StaticResource BoolToVisInverseConverter}}">
+                        <TextBlock Text="Select a handling entry to edit" FontSize="11" Foreground="{DynamicResource GrayTextBrush}" Margin="0,8"/>
+                        <TextBlock Text="Tip: Drag and drop a handling.meta file onto this tab to load it"
+                                   FontSize="10" Foreground="{DynamicResource GrayTextBrush}"/>
                     </StackPanel>
 
-                    <StackPanel Visibility="{Binding SelectedHandling, Converter={StaticResource BoolToVisInverseConverter}}">
-                        <TextBlock Text="Select a handling entry to edit" FontSize="11" Foreground="{DynamicResource GrayTextBrush}"/>
+                    <StackPanel Visibility="{Binding SelectedHandling, Converter={StaticResource BoolToVisConverter}}">
+
+                        <!-- Mass & Dimensions -->
+                        <TextBlock Text="Mass &amp; Dimensions" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,12,0,8"/>
+                        <Grid ColumnDefinitions="100,*,50" RowDefinitions="Auto,Auto,Auto,Auto">
+                            <TextBlock Text="Mass:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fMass — Vehicle total mass in kg. Affects acceleration, braking, collision behavior."/>
+                            <Slider Grid.Column="1" Value="{Binding Mass}" Minimum="100" Maximum="30000" TickFrequency="100" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Column="2" Text="{Binding Mass, StringFormat=F0, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="1" Text="Dim X:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="vecCentreOfMassDist X — Centre of mass offset along X axis."/>
+                            <Slider Grid.Row="1" Grid.Column="1" Value="{Binding DimensionsX}" Minimum="-5" Maximum="5" TickFrequency="0.1" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding DimensionsX, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="2" Text="Dim Y:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="vecCentreOfMassDist Y — Centre of mass offset along Y axis (forward/back)."/>
+                            <Slider Grid.Row="2" Grid.Column="1" Value="{Binding DimensionsY}" Minimum="-5" Maximum="5" TickFrequency="0.1" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding DimensionsY, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="3" Text="Dim Z:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="vecCentreOfMassDist Z — Centre of mass height. Raising this makes the vehicle more top-heavy."/>
+                            <Slider Grid.Row="3" Grid.Column="1" Value="{Binding DimensionsZ}" Minimum="-2" Maximum="5" TickFrequency="0.1" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding DimensionsZ, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+                        </Grid>
+
+                        <!-- Engine & Drive -->
+                        <TextBlock Text="Engine &amp; Drive" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,12,0,8"/>
+                        <Grid ColumnDefinitions="100,*,50" RowDefinitions="Auto,Auto,Auto,Auto">
+                            <TextBlock Text="Drive Force:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fInitialDriveForce — Engine power multiplier. Higher = more acceleration. Typical range 0.1-1.0."/>
+                            <Slider Grid.Column="1" Value="{Binding DriveForce}" Minimum="0.05" Maximum="2.0" TickFrequency="0.05" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Column="2" Text="{Binding DriveForce, StringFormat=F3, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="1" Text="AWD Front:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fInitialDriveForceFront — Drive bias (0=RWD, 0.5=AWD equal, 1=FWD)."/>
+                            <Slider Grid.Row="1" Grid.Column="1" Value="{Binding DriveForceFront}" Minimum="0.0" Maximum="1.0" TickFrequency="0.05" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding DriveForceFront, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="2" Text="Gears:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="nInitialDriveGears — Number of forward gears (3-10)."/>
+                            <Slider Grid.Row="2" Grid.Column="1" Value="{Binding NumberOfGears}" Minimum="1" Maximum="12" TickFrequency="1" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding NumberOfGears, StringFormat=F0, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="3" Text="Top Speed:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fInitialDriveMaxFlatVel — Maximum speed on flat ground (kph)."/>
+                            <Slider Grid.Row="3" Grid.Column="1" Value="{Binding TopSpeed}" Minimum="10" Maximum="600" TickFrequency="10" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding TopSpeed, StringFormat=F0, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+                        </Grid>
+
+                        <!-- Steering & Braking -->
+                        <TextBlock Text="Steering &amp; Braking" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,12,0,8"/>
+                        <Grid ColumnDefinitions="100,*,50" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+                            <TextBlock Text="Steer Lock:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fSteeringLock — Max steering angle in degrees. Higher = tighter turns but more twitchy."/>
+                            <Slider Grid.Column="1" Value="{Binding SteeringLock}" Minimum="5" Maximum="90" TickFrequency="5" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Column="2" Text="{Binding SteeringLock, StringFormat=F1, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="1" Text="Steer Bias:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fSteeringBias — Understeer/oversteer bias (-1=heavy oversteer, 1=understeer)."/>
+                            <Slider Grid.Row="1" Grid.Column="1" Value="{Binding SteeringBias}" Minimum="-1.0" Maximum="1.0" TickFrequency="0.05" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding SteeringBias, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="2" Text="Brake Force:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fBrakeForce — Braking power multiplier. Higher = shorter stopping distance."/>
+                            <Slider Grid.Row="2" Grid.Column="1" Value="{Binding BrakeForce}" Minimum="0.1" Maximum="5" TickFrequency="0.1" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding BrakeForce, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="3" Text="Brake Bias:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fBrakeBiasFront — Front/rear brake balance (0=all rear, 1=all front, 0.5=equal)."/>
+                            <Slider Grid.Row="3" Grid.Column="1" Value="{Binding BrakeBias}" Minimum="0" Maximum="1" TickFrequency="0.05" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding BrakeBias, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="4" Text="Handbrake:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fHandBrakeForce — Handbrake force multiplier. Higher = easier drifting."/>
+                            <Slider Grid.Row="4" Grid.Column="1" Value="{Binding HandbrakeForce}" Minimum="0" Maximum="5" TickFrequency="0.1" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="4" Grid.Column="2" Text="{Binding HandbrakeForce, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+                        </Grid>
+
+                        <!-- Suspension -->
+                        <TextBlock Text="Suspension" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,12,0,8"/>
+                        <Grid ColumnDefinitions="100,*,50" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                            <TextBlock Text="Height:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fSuspensionHeight — Suspension ride height offset. Positive = raised."/>
+                            <Slider Grid.Column="1" Value="{Binding SuspensionHeight}" Minimum="-1" Maximum="1" TickFrequency="0.05" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Column="2" Text="{Binding SuspensionHeight, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="1" Text="Lower Lim:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fSuspensionLowerLimit — How far suspension can compress (should be negative)."/>
+                            <Slider Grid.Row="1" Grid.Column="1" Value="{Binding SuspensionLowerLimit}" Minimum="-0.5" Maximum="0" TickFrequency="0.05" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding SuspensionLowerLimit, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="2" Text="Upper Lim:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fSuspensionUpperLimit — How far suspension can extend."/>
+                            <Slider Grid.Row="2" Grid.Column="1" Value="{Binding SuspensionUpperLimit}" Minimum="0" Maximum="0.5" TickFrequency="0.05" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding SuspensionUpperLimit, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="3" Text="Stiffness:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fSuspensionStiffness — Spring stiffness. Higher = sportier, lower = comfortable ride."/>
+                            <Slider Grid.Row="3" Grid.Column="1" Value="{Binding SuspensionStiffness}" Minimum="0.1" Maximum="5.0" TickFrequency="0.1" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding SuspensionStiffness, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="4" Text="Damping:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fSuspensionDamping — Damping ratio (0=bouncy, 1=stiff). Optimal ~0.05-0.15."/>
+                            <Slider Grid.Row="4" Grid.Column="1" Value="{Binding SuspensionDamping}" Minimum="0.0" Maximum="1.0" TickFrequency="0.01" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="4" Grid.Column="2" Text="{Binding SuspensionDamping, StringFormat=F3, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="5" Text="Sus Raise:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fSuspensionForce — Additional suspension raise force."/>
+                            <Slider Grid.Row="5" Grid.Column="1" Value="{Binding SuspensionRaise}" Minimum="-1" Maximum="2" TickFrequency="0.05" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="5" Grid.Column="2" Text="{Binding SuspensionRaise, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="6" Text="AntiRoll F:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fAntiRollBarStiffness — Front anti-roll bar stiffness. Reduces body roll."/>
+                            <Slider Grid.Row="6" Grid.Column="1" Value="{Binding AntiRollBarStiffFront}" Minimum="0" Maximum="5" TickFrequency="0.1" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="6" Grid.Column="2" Text="{Binding AntiRollBarStiffFront, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="7" Text="AntiRoll R:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fAntiRollBarForce — Rear anti-roll bar stiffness."/>
+                            <Slider Grid.Row="7" Grid.Column="1" Value="{Binding AntiRollBarStiffRear}" Minimum="0" Maximum="5" TickFrequency="0.1" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="7" Grid.Column="2" Text="{Binding AntiRollBarStiffRear, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+                        </Grid>
+
+                        <!-- Traction -->
+                        <TextBlock Text="Traction" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,12,0,8"/>
+                        <Grid ColumnDefinitions="100,*,50" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+                            <TextBlock Text="Traction Max:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fTractionCurveMax — Peak traction. Higher = more grip at low speed."/>
+                            <Slider Grid.Column="1" Value="{Binding TractionCurveMax}" Minimum="0.1" Maximum="5" TickFrequency="0.1" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Column="2" Text="{Binding TractionCurveMax, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="1" Text="Traction Min:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fTractionCurveMin — Traction at wheel slip. Lower = more spinning."/>
+                            <Slider Grid.Row="1" Grid.Column="1" Value="{Binding TractionCurveMin}" Minimum="0.1" Maximum="5" TickFrequency="0.1" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding TractionCurveMin, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="2" Text="Lateral:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fTractionCurveLateral — Lateral traction angle at peak grip (degrees)."/>
+                            <Slider Grid.Row="2" Grid.Column="1" Value="{Binding TractionCurveLateral}" Minimum="5" Maximum="60" TickFrequency="1" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding TractionCurveLateral, StringFormat=F1, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="3" Text="Bias Front:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fTractionBiasFront — Front/rear traction balance (0=all rear, 1=all front)."/>
+                            <Slider Grid.Row="3" Grid.Column="1" Value="{Binding TractionBiasFront}" Minimum="0" Maximum="1" TickFrequency="0.05" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding TractionBiasFront, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="4" Text="Loss Mult:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fTractionLossMult — Traction loss multiplier on different surfaces."/>
+                            <Slider Grid.Row="4" Grid.Column="1" Value="{Binding TractionLossMult}" Minimum="0" Maximum="5" TickFrequency="0.1" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="4" Grid.Column="2" Text="{Binding TractionLossMult, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="5" Text="Spring Delta:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fTractionSpringDeltaMax — Max spring delta for traction calculation."/>
+                            <Slider Grid.Row="5" Grid.Column="1" Value="{Binding TractionSpringDeltaMax}" Minimum="0" Maximum="1" TickFrequency="0.01" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="5" Grid.Column="2" Text="{Binding TractionSpringDeltaMax, StringFormat=F3, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+                        </Grid>
+
+                        <!-- Damage -->
+                        <TextBlock Text="Damage" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,12,0,8"/>
+                        <Grid ColumnDefinitions="100,*,50" RowDefinitions="Auto,Auto,Auto,Auto">
+                            <TextBlock Text="Deformation:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fDeformationDamageMult — Body deformation multiplier (1=normal, 0=indestructible)."/>
+                            <Slider Grid.Column="1" Value="{Binding DeformationDamageMult}" Minimum="0" Maximum="5" TickFrequency="0.1" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Column="2" Text="{Binding DeformationDamageMult, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="1" Text="Collision:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fCollisionDamageMult — Damage received from collisions."/>
+                            <Slider Grid.Row="1" Grid.Column="1" Value="{Binding CollisionDamageMult}" Minimum="0" Maximum="5" TickFrequency="0.1" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding CollisionDamageMult, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="2" Text="Engine:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fEngineDamageMult — Engine damage multiplier (0=engine can't be damaged)."/>
+                            <Slider Grid.Row="2" Grid.Column="1" Value="{Binding EngineDamageMult}" Minimum="0" Maximum="5" TickFrequency="0.1" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding EngineDamageMult, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="3" Text="Petrol Tank:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fPetrolTankVolume — Fuel tank size in liters. Affects how long before fuel runs out."/>
+                            <Slider Grid.Row="3" Grid.Column="1" Value="{Binding PetrolTankVolume}" Minimum="0" Maximum="200" TickFrequency="5" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding PetrolTankVolume, StringFormat=F0, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+                        </Grid>
+
+                        <!-- Advanced -->
+                        <TextBlock Text="Advanced" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,12,0,8"/>
+                        <Grid ColumnDefinitions="100,*,50" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+                            <TextBlock Text="Downforce:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fDownforceModifier — Aerodynamic downforce at speed. Higher = more grip at high speed."/>
+                            <Slider Grid.Column="1" Value="{Binding Downforce}" Minimum="0.0" Maximum="2.0" TickFrequency="0.05" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Column="2" Text="{Binding Downforce, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="1" Text="Roll Ctr F:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fRollCentreHeightFront — Front roll centre height. Affects body roll in corners."/>
+                            <Slider Grid.Row="1" Grid.Column="1" Value="{Binding RollCentreHeightFront}" Minimum="0.0" Maximum="1.0" TickFrequency="0.05" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding RollCentreHeightFront, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="2" Text="Roll Ctr R:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fRollCentreHeightRear — Rear roll centre height."/>
+                            <Slider Grid.Row="2" Grid.Column="1" Value="{Binding RollCentreHeightRear}" Minimum="0.0" Maximum="1.0" TickFrequency="0.05" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding RollCentreHeightRear, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="3" Text="Camber:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fCamberStiffnessBetweenAxles — Camber stiffness between axles."/>
+                            <Slider Grid.Row="3" Grid.Column="1" Value="{Binding CamberStiffness}" Minimum="0.0" Maximum="1.0" TickFrequency="0.05" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding CamberStiffness, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="4" Text="Weapon Dmg:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="fWeaponDamageMult — Damage received from weapons (0=immune to bullets)."/>
+                            <Slider Grid.Row="4" Grid.Column="1" Value="{Binding WeaponForceMult}" Minimum="0" Maximum="5" TickFrequency="0.1" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="4" Grid.Column="2" Text="{Binding WeaponForceMult, StringFormat=F2, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+                        </Grid>
+
+                        <!-- Inertia -->
+                        <TextBlock Text="Inertia Multiplier" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,12,0,8"/>
+                        <Grid ColumnDefinitions="100,*,50" RowDefinitions="Auto,Auto,Auto">
+                            <TextBlock Text="Inertia X:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="vecInertiaMultiplier X — Roll inertia. Higher = more resistant to rolling."/>
+                            <Slider Grid.Column="1" Value="{Binding AccelerationX}" Minimum="0.1" Maximum="2.0" TickFrequency="0.05" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Column="2" Text="{Binding AccelerationX, StringFormat=F3, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="1" Text="Inertia Y:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="vecInertiaMultiplier Y — Pitch inertia."/>
+                            <Slider Grid.Row="1" Grid.Column="1" Value="{Binding AccelerationY}" Minimum="-1.0" Maximum="1.0" TickFrequency="0.05" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding AccelerationY, StringFormat=F3, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+
+                            <TextBlock Grid.Row="2" Text="Inertia Z:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"
+                                       ToolTip="vecInertiaMultiplier Z — Yaw inertia. Higher = more resistant to spinning."/>
+                            <Slider Grid.Row="2" Grid.Column="1" Value="{Binding AccelerationZ}" Minimum="-1.0" Maximum="1.0" TickFrequency="0.05" IsSnapToTickEnabled="False" Margin="10,0"/>
+                            <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding AccelerationZ, StringFormat=F3, UpdateSourceTrigger=PropertyChanged}" Foreground="{DynamicResource GrayTextBrush}" Background="Transparent" BorderThickness="0" FontSize="10"/>
+                        </Grid>
+
                     </StackPanel>
                 </StackPanel>
             </ScrollViewer>
@@ -190,4 +312,3 @@
         </Border>
     </Grid>
 </UserControl>
-

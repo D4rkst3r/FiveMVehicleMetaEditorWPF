@@ -16,13 +16,16 @@
         </Grid.ColumnDefinitions>
 
         <!-- Toolbar -->
-        <Border Grid.Row="0" Grid.ColumnSpan="2" Background="{DynamicResource SecondaryBgBrush}" Padding="10">
+        <Border Grid.Row="0" Grid.ColumnSpan="2" Background="{DynamicResource SecondaryBgBrush}" Padding="8,6">
             <StackPanel Orientation="Horizontal">
-                <Button Command="{Binding LoadCommand}" Content="📂 Load" Width="80" Style="{StaticResource CommandButtonStyle}"/>
-                <Button Command="{Binding SaveCommand}" Content="💾 Save" Width="80" Style="{StaticResource CommandButtonStyle}"/>
-                <Button Command="{Binding ExportCommand}" Content="📤 Export" Width="80" Style="{StaticResource CommandButtonStyle}"/>
+                <Button Command="{Binding LoadCommand}" Content="Load" Width="65" Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Load carvariations.meta"/>
+                <Button Command="{Binding SaveCommand}" Content="Save" Width="65" Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Save carvariations.meta (auto-backup)"/>
+                <Button Command="{Binding ExportCommand}" Content="Export" Width="65" Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Export as JSON"/>
                 <Separator Width="10"/>
-                <TextBlock Text="{Binding Variations.Count}" Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center" FontWeight="Bold" FontSize="14"/>
+                <TextBlock Text="{Binding Variations.Count}" Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center" FontWeight="Bold" FontSize="13"/>
                 <TextBlock Text=" vehicles" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
             </StackPanel>
         </Border>
@@ -34,7 +37,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <TextBlock Grid.Row="0" Text="🎨 Vehicles" FontSize="12" FontWeight="Bold"
+                <TextBlock Grid.Row="0" Text="Vehicles" FontSize="12" FontWeight="Bold"
                            Foreground="{DynamicResource PrimaryBrush}" Margin="8,8,8,5"/>
                 <ListBox Grid.Row="1"
                          ItemsSource="{Binding Variations}"
@@ -51,76 +54,97 @@
             </Grid>
         </Border>
 
-        <!-- Right: Variation Details -->
-        <Border Grid.Row="1" Grid.Column="1" Background="{DynamicResource SecondaryBgBrush}" Margin="5" Padding="15">
+        <!-- Right: Variation Details + Color Editor -->
+        <Border Grid.Row="1" Grid.Column="1" Background="{DynamicResource SecondaryBgBrush}" Margin="5" Padding="12">
             <Grid>
-
-            <!-- Empty state -->
-            <StackPanel Visibility="{Binding SelectedVariation, Converter={StaticResource BoolToVisInverseConverter}}">
-                <TextBlock Text="🎨 Carvariations Editor" FontSize="14" FontWeight="Bold"
-                           Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,10"/>
-                <TextBlock Text="Select a vehicle from the list to view its color variation data."
-                           FontSize="11" Foreground="{DynamicResource GrayTextBrush}" TextWrapping="Wrap"/>
-            </StackPanel>
-
-            <!-- Vehicle details -->
-            <ScrollViewer Visibility="{Binding SelectedVariation, Converter={StaticResource BoolToVisConverter}}">
-                <StackPanel>
-                    <!-- Model name -->
-                    <TextBlock Text="{Binding SelectedVariation}" FontSize="18" FontWeight="Bold"
-                               Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,12"/>
-
-                    <!-- Stats -->
-                    <Border Background="{DynamicResource DarkBgBrush}" CornerRadius="4" Padding="10" Margin="0,0,0,12">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="130"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
-                            </Grid.RowDefinitions>
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Color Variants:" Foreground="{DynamicResource GrayTextBrush}" FontSize="11" Margin="0,3"/>
-                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ColorCount}" Foreground="{DynamicResource PrimaryBrush}" FontWeight="Bold" FontSize="11" Margin="0,3"/>
-                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Mod Kits:" Foreground="{DynamicResource GrayTextBrush}" FontSize="11" Margin="0,3"/>
-                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding KitNames.Count}" Foreground="{DynamicResource PrimaryBrush}" FontWeight="Bold" FontSize="11" Margin="0,3"/>
-                        </Grid>
-                    </Border>
-
-                    <!-- Kit names -->
-                    <TextBlock Text="Assigned Mod Kits" FontSize="12" FontWeight="Bold"
-                               Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,5"/>
-                    <ListBox ItemsSource="{Binding KitNames}"
-                             Background="{DynamicResource DarkBgBrush}"
-                             Foreground="{DynamicResource LightTextBrush}"
-                             MaxHeight="80" Margin="0,0,0,12"
-                             ScrollViewer.VerticalScrollBarVisibility="Auto">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding}" FontSize="11"
-                                           Foreground="{DynamicResource LightTextBrush}" Padding="2"/>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-
-                    <!-- Color variants -->
-                    <TextBlock Text="Color Variants (Indices)" FontSize="12" FontWeight="Bold"
-                               Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,5"/>
-                    <ListBox ItemsSource="{Binding ColorSummaries}"
-                             Background="{DynamicResource DarkBgBrush}"
-                             Foreground="{DynamicResource LightTextBrush}"
-                             MaxHeight="250"
-                             ScrollViewer.VerticalScrollBarVisibility="Auto">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding}" FontSize="11"
-                                           Foreground="{DynamicResource LightTextBrush}" Padding="2"/>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
+                <!-- Empty state -->
+                <StackPanel Visibility="{Binding SelectedVariation, Converter={StaticResource BoolToVisInverseConverter}}">
+                    <TextBlock Text="Carvariations Editor" FontSize="14" FontWeight="Bold"
+                               Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,10"/>
+                    <TextBlock Text="Select a vehicle from the list to view and edit its color variation data."
+                               FontSize="11" Foreground="{DynamicResource GrayTextBrush}" TextWrapping="Wrap"/>
                 </StackPanel>
-            </ScrollViewer>
+
+                <!-- Vehicle details -->
+                <ScrollViewer Visibility="{Binding SelectedVariation, Converter={StaticResource BoolToVisConverter}}">
+                    <StackPanel>
+                        <TextBlock Text="{Binding SelectedVariation}" FontSize="17" FontWeight="Bold"
+                                   Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,10"/>
+
+                        <!-- Stats -->
+                        <Border Background="{DynamicResource DarkBgBrush}" CornerRadius="4" Padding="10" Margin="0,0,0,10">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Color Variants:" Foreground="{DynamicResource GrayTextBrush}" FontSize="11" Margin="0,3"/>
+                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ColorCount}" Foreground="{DynamicResource PrimaryBrush}" FontWeight="Bold" FontSize="11" Margin="0,3"/>
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Mod Kits:" Foreground="{DynamicResource GrayTextBrush}" FontSize="11" Margin="0,3"/>
+                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding KitNames.Count}" Foreground="{DynamicResource PrimaryBrush}" FontWeight="Bold" FontSize="11" Margin="0,3"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Kit names -->
+                        <TextBlock Text="Assigned Mod Kits" FontSize="12" FontWeight="Bold"
+                                   Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,5"/>
+                        <ListBox ItemsSource="{Binding KitNames}"
+                                 Background="{DynamicResource DarkBgBrush}"
+                                 Foreground="{DynamicResource LightTextBrush}"
+                                 MaxHeight="70" Margin="0,0,0,10">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" FontSize="11" Foreground="{DynamicResource LightTextBrush}" Padding="2"/>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <!-- Color variants header + Add/Delete -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                            <TextBlock Text="Color Variants" FontSize="12" FontWeight="Bold"
+                                       Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center"/>
+                            <Button Command="{Binding AddColorVariantCommand}" Content="+ Add" Width="55"
+                                    Margin="10,0,5,0" Style="{StaticResource CommandButtonStyle}" FontSize="10"
+                                    ToolTip="Add a new blank color variant"/>
+                            <Button Command="{Binding DeleteColorVariantCommand}" Content="Delete" Width="55"
+                                    Style="{StaticResource CommandButtonStyle}" FontSize="10"
+                                    ToolTip="Delete the selected color variant"/>
+                        </StackPanel>
+
+                        <ListBox ItemsSource="{Binding ColorSummaries}"
+                                 SelectedItem="{Binding SelectedColorSummary}"
+                                 Background="{DynamicResource DarkBgBrush}"
+                                 Foreground="{DynamicResource LightTextBrush}"
+                                 MaxHeight="180">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" FontSize="11" Foreground="{DynamicResource LightTextBrush}" Padding="2"/>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+
+                        <!-- Color index editor -->
+                        <Border Background="{DynamicResource DarkBgBrush}" CornerRadius="4" Padding="10" Margin="0,8,0,0"
+                                Visibility="{Binding SelectedColorSummary, Converter={StaticResource BoolToVisConverter}}">
+                            <StackPanel>
+                                <TextBlock Text="Edit Color Indices" FontSize="11" FontWeight="Bold"
+                                           Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,4"/>
+                                <TextBlock Text="Space-separated palette indices (e.g. 27 0 28 0 93 134)"
+                                           FontSize="10" Foreground="{DynamicResource GrayTextBrush}" Margin="0,0,0,6"/>
+                                <TextBox Text="{Binding EditColorIndices, UpdateSourceTrigger=PropertyChanged}"
+                                         Background="{DynamicResource SecondaryBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                         Padding="6,4" BorderThickness="1" BorderBrush="#555" Margin="0,0,0,6"
+                                         ToolTip="Color palette indices (0-159). Up to 6 per variant."/>
+                                <Button Command="{Binding SaveColorIndicesCommand}" Content="Save Indices"
+                                        Width="100" HorizontalAlignment="Left" Style="{StaticResource CommandButtonStyle}"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
             </Grid>
         </Border>
 

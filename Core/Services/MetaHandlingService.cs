@@ -9,13 +9,9 @@ namespace FiveMVehicleMetaEditorWPF.Core.Services
 {
     /// <summary>
     /// Service for loading, parsing, and saving handling.meta files
-    /// Direct port from Python core/meta_handling.py
     /// </summary>
     public class MetaHandlingService
     {
-        /// <summary>
-        /// Load handling.meta file and extract handling entries
-        /// </summary>
         public (bool Success, List<HandlingData>? HandlingEntries, string? Error) LoadHandlingMeta(string filePath)
         {
             try
@@ -32,14 +28,12 @@ namespace FiveMVehicleMetaEditorWPF.Core.Services
 
                 var handlingList = new List<HandlingData>();
 
-                // Real GTA handling.meta: <CHandlingDataMgr><HandlingData><Item type="CHandlingData">
                 var items = root.Descendants("HandlingData")
                     .Elements("Item")
                     .ToList();
 
                 foreach (var item in items)
                 {
-                    // Real field name is "handlingName", not "handlingNameHash"
                     var handlingNameElem = item.Element("handlingName") ?? item.Element("handlingNameHash");
                     if (handlingNameElem?.Value == null || string.IsNullOrWhiteSpace(handlingNameElem.Value))
                         continue;
@@ -50,40 +44,60 @@ namespace FiveMVehicleMetaEditorWPF.Core.Services
                         OriginalElement = item
                     };
 
-                    // Parse numeric values
-                    data.Mass = ParseFloatValue(item, "fMass") ?? data.Mass;
-                    data.Dimensions_X = ParseFloatValue(item, "vecCentreOfMassDist", "x") ?? data.Dimensions_X;
-                    data.Dimensions_Y = ParseFloatValue(item, "vecCentreOfMassDist", "y") ?? data.Dimensions_Y;
-                    data.Dimensions_Z = ParseFloatValue(item, "vecCentreOfMassDist", "z") ?? data.Dimensions_Z;
+                    // Mass & Dimensions
+                    data.Mass = ParseFloat(item, "fMass") ?? data.Mass;
+                    data.Dimensions_X = ParseFloatAttr(item, "vecCentreOfMassDist", "x") ?? data.Dimensions_X;
+                    data.Dimensions_Y = ParseFloatAttr(item, "vecCentreOfMassDist", "y") ?? data.Dimensions_Y;
+                    data.Dimensions_Z = ParseFloatAttr(item, "vecCentreOfMassDist", "z") ?? data.Dimensions_Z;
 
-                    // Transmission
-                    data.AccelerationX = ParseFloatValue(item, "vecInertiaMultiplier", "x") ?? data.AccelerationX;
-                    data.AccelerationY = ParseFloatValue(item, "vecInertiaMultiplier", "y") ?? data.AccelerationY;
-                    data.AccelerationZ = ParseFloatValue(item, "vecInertiaMultiplier", "z") ?? data.AccelerationZ;
-                    data.NumberOfGears = ParseIntValue(item, "nInitialDriveGears") ?? data.NumberOfGears;
-                    data.TopSpeed = ParseFloatValue(item, "fInitialDriveMaxFlatVel") ?? data.TopSpeed;
+                    // Engine & Drive
+                    data.DriveForce = ParseFloat(item, "fInitialDriveForce") ?? data.DriveForce;
+                    data.DriveForceFront = ParseFloat(item, "fInitialDriveForceFront") ?? data.DriveForceFront;
+                    data.NumberOfGears = ParseInt(item, "nInitialDriveGears") ?? data.NumberOfGears;
+                    data.TopSpeed = ParseFloat(item, "fInitialDriveMaxFlatVel") ?? data.TopSpeed;
+
+                    // Transmission (inertia)
+                    data.AccelerationX = ParseFloatAttr(item, "vecInertiaMultiplier", "x") ?? data.AccelerationX;
+                    data.AccelerationY = ParseFloatAttr(item, "vecInertiaMultiplier", "y") ?? data.AccelerationY;
+                    data.AccelerationZ = ParseFloatAttr(item, "vecInertiaMultiplier", "z") ?? data.AccelerationZ;
 
                     // Steering & Braking
-                    data.SteeringLock = ParseFloatValue(item, "fSteeringLock") ?? data.SteeringLock;
-                    data.SteeringBias = ParseFloatValue(item, "fSteeringBias") ?? data.SteeringBias;
-                    data.BrakeForce = ParseFloatValue(item, "fBrakeForce") ?? data.BrakeForce;
-                    data.BrakeBias = ParseFloatValue(item, "fBrakeBiasFront") ?? data.BrakeBias;
+                    data.SteeringLock = ParseFloat(item, "fSteeringLock") ?? data.SteeringLock;
+                    data.SteeringBias = ParseFloat(item, "fSteeringBias") ?? data.SteeringBias;
+                    data.BrakeForce = ParseFloat(item, "fBrakeForce") ?? data.BrakeForce;
+                    data.BrakeBias = ParseFloat(item, "fBrakeBiasFront") ?? data.BrakeBias;
+                    data.HandbrakeForce = ParseFloat(item, "fHandBrakeForce") ?? data.HandbrakeForce;
 
                     // Suspension
-                    data.SuspensionHeight = ParseFloatValue(item, "fSuspensionHeight") ?? data.SuspensionHeight;
-                    data.SuspensionLowerLimit = ParseFloatValue(item, "fSuspensionLowerLimit") ?? data.SuspensionLowerLimit;
-                    data.SuspensionUpperLimit = ParseFloatValue(item, "fSuspensionUpperLimit") ?? data.SuspensionUpperLimit;
-                    data.SuspensionStiffness = ParseFloatValue(item, "fSuspensionStiffness") ?? data.SuspensionStiffness;
-                    data.SuspensionDamping = ParseFloatValue(item, "fSuspensionDamping") ?? data.SuspensionDamping;
+                    data.SuspensionHeight = ParseFloat(item, "fSuspensionHeight") ?? data.SuspensionHeight;
+                    data.SuspensionLowerLimit = ParseFloat(item, "fSuspensionLowerLimit") ?? data.SuspensionLowerLimit;
+                    data.SuspensionUpperLimit = ParseFloat(item, "fSuspensionUpperLimit") ?? data.SuspensionUpperLimit;
+                    data.SuspensionStiffness = ParseFloat(item, "fSuspensionStiffness") ?? data.SuspensionStiffness;
+                    data.SuspensionDamping = ParseFloat(item, "fSuspensionDamping") ?? data.SuspensionDamping;
+                    data.SuspensionRaise = ParseFloat(item, "fSuspensionForce") ?? data.SuspensionRaise;
+                    data.AntiRollBarStiffFront = ParseFloat(item, "fAntiRollBarStiffness") ?? data.AntiRollBarStiffFront;
+                    data.AntiRollBarStiffRear = ParseFloat(item, "fAntiRollBarForce") ?? data.AntiRollBarStiffRear;
 
                     // Traction
-                    data.TractionCurveMax = ParseFloatValue(item, "fTractionCurveMax") ?? data.TractionCurveMax;
-                    data.TractionCurveMin = ParseFloatValue(item, "fTractionCurveMin") ?? data.TractionCurveMin;
+                    data.TractionCurveMax = ParseFloat(item, "fTractionCurveMax") ?? data.TractionCurveMax;
+                    data.TractionCurveMin = ParseFloat(item, "fTractionCurveMin") ?? data.TractionCurveMin;
+                    data.TractionCurveLateral = ParseFloat(item, "fTractionCurveLateral") ?? data.TractionCurveLateral;
+                    data.TractionSpringDeltaMax = ParseFloat(item, "fTractionSpringDeltaMax") ?? data.TractionSpringDeltaMax;
+                    data.TractionBiasFront = ParseFloat(item, "fTractionBiasFront") ?? data.TractionBiasFront;
+                    data.TractionLossMult = ParseFloat(item, "fTractionLossMult") ?? data.TractionLossMult;
 
-                    // Advanced settings
-                    data.Downforce = ParseFloatValue(item, "fDownforceModifier") ?? data.Downforce;
-                    data.RollCentreHeightFront = ParseFloatValue(item, "fRollCentreHeightFront") ?? data.RollCentreHeightFront;
-                    data.RollCentreHeightRear = ParseFloatValue(item, "fRollCentreHeightRear") ?? data.RollCentreHeightRear;
+                    // Damage
+                    data.DeformationDamageMult = ParseFloat(item, "fDeformationDamageMult") ?? data.DeformationDamageMult;
+                    data.CollisionDamageMult = ParseFloat(item, "fCollisionDamageMult") ?? data.CollisionDamageMult;
+                    data.EngineDamageMult = ParseFloat(item, "fEngineDamageMult") ?? data.EngineDamageMult;
+                    data.PetrolTankVolume = ParseFloat(item, "fPetrolTankVolume") ?? data.PetrolTankVolume;
+
+                    // Advanced
+                    data.Downforce = ParseFloat(item, "fDownforceModifier") ?? data.Downforce;
+                    data.RollCentreHeightFront = ParseFloat(item, "fRollCentreHeightFront") ?? data.RollCentreHeightFront;
+                    data.RollCentreHeightRear = ParseFloat(item, "fRollCentreHeightRear") ?? data.RollCentreHeightRear;
+                    data.CamberStiffness = ParseFloat(item, "fCamberStiffnessBetweenAxles") ?? data.CamberStiffness;
+                    data.WeaponForceMult = ParseFloat(item, "fWeaponDamageMult") ?? data.WeaponForceMult;
 
                     handlingList.Add(data);
                 }
@@ -96,18 +110,10 @@ namespace FiveMVehicleMetaEditorWPF.Core.Services
             }
         }
 
-        /// <summary>
-        /// Save handling data back to XML file
-        /// </summary>
         public (bool Success, string? Error) SaveHandlingMeta(string filePath, List<HandlingData> handlingList)
         {
             try
             {
-                // Create backup before saving
-                var backupPath = filePath + ".backup";
-                if (File.Exists(filePath))
-                    File.Copy(filePath, backupPath, true);
-
                 var doc = new XDocument(
                     new XDeclaration("1.0", "UTF-8", null),
                     new XElement("CHandlingDataMgr",
@@ -126,9 +132,6 @@ namespace FiveMVehicleMetaEditorWPF.Core.Services
             }
         }
 
-        /// <summary>
-        /// Filter handling entries by search term
-        /// </summary>
         public List<HandlingData> FilterHandling(List<HandlingData> handlingList, string searchTerm)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
@@ -139,73 +142,83 @@ namespace FiveMVehicleMetaEditorWPF.Core.Services
                 .ToList();
         }
 
-        /// <summary>
-        /// Create XML element from HandlingData object
-        /// </summary>
-        private XElement CreateHandlingElement(HandlingData handling)
+        private XElement CreateHandlingElement(HandlingData h)
         {
-            var elem = new XElement("Item",
-                new XElement("handlingNameHash", handling.HandlingName),
-                new XElement("fMass", new XAttribute("value", handling.Mass)),
+            return new XElement("Item",
+                new XElement("handlingName", h.HandlingName),
+                new XElement("fMass", new XAttribute("value", h.Mass)),
                 new XElement("vecCentreOfMassDist",
-                    new XAttribute("x", handling.Dimensions_X),
-                    new XAttribute("y", handling.Dimensions_Y),
-                    new XAttribute("z", handling.Dimensions_Z)),
+                    new XAttribute("x", h.Dimensions_X),
+                    new XAttribute("y", h.Dimensions_Y),
+                    new XAttribute("z", h.Dimensions_Z)),
                 new XElement("vecInertiaMultiplier",
-                    new XAttribute("x", handling.AccelerationX),
-                    new XAttribute("y", handling.AccelerationY),
-                    new XAttribute("z", handling.AccelerationZ)),
-                new XElement("nInitialDriveGears", new XAttribute("value", handling.NumberOfGears)),
-                new XElement("fInitialDriveMaxFlatVel", new XAttribute("value", handling.TopSpeed)),
-                new XElement("fSteeringLock", new XAttribute("value", handling.SteeringLock)),
-                new XElement("fSteeringBias", new XAttribute("value", handling.SteeringBias)),
-                new XElement("fBrakeForce", new XAttribute("value", handling.BrakeForce)),
-                new XElement("fBrakeBiasFront", new XAttribute("value", handling.BrakeBias)),
-                new XElement("fSuspensionHeight", new XAttribute("value", handling.SuspensionHeight)),
-                new XElement("fSuspensionLowerLimit", new XAttribute("value", handling.SuspensionLowerLimit)),
-                new XElement("fSuspensionUpperLimit", new XAttribute("value", handling.SuspensionUpperLimit)),
-                new XElement("fSuspensionStiffness", new XAttribute("value", handling.SuspensionStiffness)),
-                new XElement("fSuspensionDamping", new XAttribute("value", handling.SuspensionDamping)),
-                new XElement("fTractionCurveMax", new XAttribute("value", handling.TractionCurveMax)),
-                new XElement("fTractionCurveMin", new XAttribute("value", handling.TractionCurveMin)),
-                new XElement("fDownforceModifier", new XAttribute("value", handling.Downforce)),
-                new XElement("fRollCentreHeightFront", new XAttribute("value", handling.RollCentreHeightFront)),
-                new XElement("fRollCentreHeightRear", new XAttribute("value", handling.RollCentreHeightRear))
+                    new XAttribute("x", h.AccelerationX),
+                    new XAttribute("y", h.AccelerationY),
+                    new XAttribute("z", h.AccelerationZ)),
+                new XElement("fInitialDriveForce", new XAttribute("value", h.DriveForce)),
+                new XElement("fInitialDriveForceFront", new XAttribute("value", h.DriveForceFront)),
+                new XElement("nInitialDriveGears", new XAttribute("value", h.NumberOfGears)),
+                new XElement("fInitialDriveMaxFlatVel", new XAttribute("value", h.TopSpeed)),
+                new XElement("fSteeringLock", new XAttribute("value", h.SteeringLock)),
+                new XElement("fSteeringBias", new XAttribute("value", h.SteeringBias)),
+                new XElement("fBrakeForce", new XAttribute("value", h.BrakeForce)),
+                new XElement("fBrakeBiasFront", new XAttribute("value", h.BrakeBias)),
+                new XElement("fHandBrakeForce", new XAttribute("value", h.HandbrakeForce)),
+                new XElement("fSuspensionHeight", new XAttribute("value", h.SuspensionHeight)),
+                new XElement("fSuspensionLowerLimit", new XAttribute("value", h.SuspensionLowerLimit)),
+                new XElement("fSuspensionUpperLimit", new XAttribute("value", h.SuspensionUpperLimit)),
+                new XElement("fSuspensionStiffness", new XAttribute("value", h.SuspensionStiffness)),
+                new XElement("fSuspensionDamping", new XAttribute("value", h.SuspensionDamping)),
+                new XElement("fSuspensionForce", new XAttribute("value", h.SuspensionRaise)),
+                new XElement("fAntiRollBarStiffness", new XAttribute("value", h.AntiRollBarStiffFront)),
+                new XElement("fAntiRollBarForce", new XAttribute("value", h.AntiRollBarStiffRear)),
+                new XElement("fTractionCurveMax", new XAttribute("value", h.TractionCurveMax)),
+                new XElement("fTractionCurveMin", new XAttribute("value", h.TractionCurveMin)),
+                new XElement("fTractionCurveLateral", new XAttribute("value", h.TractionCurveLateral)),
+                new XElement("fTractionSpringDeltaMax", new XAttribute("value", h.TractionSpringDeltaMax)),
+                new XElement("fTractionBiasFront", new XAttribute("value", h.TractionBiasFront)),
+                new XElement("fTractionLossMult", new XAttribute("value", h.TractionLossMult)),
+                new XElement("fDeformationDamageMult", new XAttribute("value", h.DeformationDamageMult)),
+                new XElement("fCollisionDamageMult", new XAttribute("value", h.CollisionDamageMult)),
+                new XElement("fEngineDamageMult", new XAttribute("value", h.EngineDamageMult)),
+                new XElement("fPetrolTankVolume", new XAttribute("value", h.PetrolTankVolume)),
+                new XElement("fDownforceModifier", new XAttribute("value", h.Downforce)),
+                new XElement("fRollCentreHeightFront", new XAttribute("value", h.RollCentreHeightFront)),
+                new XElement("fRollCentreHeightRear", new XAttribute("value", h.RollCentreHeightRear)),
+                new XElement("fCamberStiffnessBetweenAxles", new XAttribute("value", h.CamberStiffness)),
+                new XElement("fWeaponDamageMult", new XAttribute("value", h.WeaponForceMult))
             );
-
-            return elem;
         }
 
-        /// <summary>
-        /// Helper method to parse float value from XML element
-        /// </summary>
-        private float? ParseFloatValue(XElement item, string elementName)
+        private float? ParseFloat(XElement item, string elementName)
         {
             var elem = item.Element(elementName);
-            if (elem != null && float.TryParse(elem.Attribute("value")?.Value, out var value))
-                return value;
+            if (elem == null) return null;
+            var val = elem.Attribute("value")?.Value ?? elem.Value;
+            if (float.TryParse(val, System.Globalization.NumberStyles.Float,
+                System.Globalization.CultureInfo.InvariantCulture, out var result))
+                return result;
             return null;
         }
 
-        /// <summary>
-        /// Helper method to parse float value from XML element with attribute
-        /// </summary>
-        private float? ParseFloatValue(XElement item, string elementName, string attributeName)
+        private float? ParseFloatAttr(XElement item, string elementName, string attributeName)
         {
             var elem = item.Element(elementName);
-            if (elem != null && float.TryParse(elem.Attribute(attributeName)?.Value, out var value))
-                return value;
+            if (elem == null) return null;
+            if (float.TryParse(elem.Attribute(attributeName)?.Value,
+                System.Globalization.NumberStyles.Float,
+                System.Globalization.CultureInfo.InvariantCulture, out var result))
+                return result;
             return null;
         }
 
-        /// <summary>
-        /// Helper method to parse integer value from XML element
-        /// </summary>
-        private int? ParseIntValue(XElement item, string elementName)
+        private int? ParseInt(XElement item, string elementName)
         {
             var elem = item.Element(elementName);
-            if (elem != null && int.TryParse(elem.Attribute("value")?.Value, out var value))
-                return value;
+            if (elem == null) return null;
+            var val = elem.Attribute("value")?.Value ?? elem.Value;
+            if (int.TryParse(val, out var result))
+                return result;
             return null;
         }
     }

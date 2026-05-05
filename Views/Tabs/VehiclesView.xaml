@@ -3,9 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             mc:Ignorable="d">
+             mc:Ignorable="d"
+             AllowDrop="True"
+             Drop="OnFileDrop" DragOver="OnDragOver">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
@@ -16,30 +19,68 @@
         </Grid.ColumnDefinitions>
 
         <!-- Toolbar -->
-        <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Background="{DynamicResource SecondaryBgBrush}" Padding="10">
-            <StackPanel Orientation="Horizontal">
-                <Button Command="{Binding LoadCommand}" Content="📂 Load" Width="80" Style="{StaticResource CommandButtonStyle}"/>
-                <Button Command="{Binding SaveCommand}" Content="💾 Save" Width="80" Style="{StaticResource CommandButtonStyle}"/>
-                <Button Command="{Binding ExportCommand}" Content="📤 Export" Width="80" Style="{StaticResource CommandButtonStyle}"/>
-                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Width="1"/>
-                <TextBlock Text="{Binding VehicleCount}" Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center"/>
-                <TextBlock Text="vehicles loaded" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center"/>
-            </StackPanel>
+        <Border Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Background="{DynamicResource SecondaryBgBrush}" Padding="8,6">
+            <WrapPanel Orientation="Horizontal">
+                <Button Command="{Binding LoadCommand}" Content="&#x1F4C2; Load" Width="80" Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Load a vehicles.meta file"/>
+                <Button Command="{Binding SaveCommand}" Content="&#x1F4BE; Save" Width="80" Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Save to vehicles.meta (auto-backup created)"/>
+                <Button Command="{Binding ExportCommand}" Content="&#x1F4E4; Export" Width="80" Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Export as JSON"/>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Width="1" Margin="4,0"/>
+                <Button Command="{Binding AddVehicleCommand}" Content="+ Add" Width="60" Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Add new blank vehicle"/>
+                <Button Command="{Binding DuplicateVehicleCommand}" Content="Clone" Width="60" Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Duplicate selected vehicle"/>
+                <Button Command="{Binding DeleteVehicleCommand}" Content="Delete" Width="65" Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Delete selected vehicle"/>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Width="1" Margin="4,0"/>
+                <Button Command="{Binding UndoCommand}" Content="Undo" Width="55" Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Undo last change"/>
+                <Button Command="{Binding RedoCommand}" Content="Redo" Width="55" Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Redo"/>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Width="1" Margin="4,0"/>
+                <Button Command="{Binding ToggleBatchPanelCommand}" Content="Batch" Width="55" Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Batch-edit all vehicles"/>
+                <Separator Style="{StaticResource {x:Static ToolBar.SeparatorStyleKey}}" Width="1" Margin="4,0"/>
+                <TextBlock Text="{Binding VehicleCount}" Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center" FontWeight="Bold"/>
+                <TextBlock Text=" vehicles" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+            </WrapPanel>
+        </Border>
+
+        <!-- Batch Edit Panel (collapsible) -->
+        <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                Background="#1A2233" Padding="10,6"
+                Visibility="{Binding ShowBatchPanel, Converter={StaticResource BoolToVisConverter}}">
+            <WrapPanel Orientation="Horizontal">
+                <TextBlock Text="Batch Edit ALL:" Foreground="{DynamicResource PrimaryBrush}" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="Bold"/>
+                <TextBlock Text="Class:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                <TextBox Text="{Binding BatchVehicleClass, UpdateSourceTrigger=PropertyChanged}" Width="130"
+                         Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                         Padding="4,2" BorderBrush="#444" BorderThickness="1"
+                         ToolTip="e.g. VC_SPORTS, VC_SUV, VC_EMERGENCY"/>
+                <Button Command="{Binding ApplyBatchClassCommand}" Content="Set Class" Width="80" Margin="4,0,12,0" Style="{StaticResource CommandButtonStyle}"/>
+                <TextBlock Text="Type:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                <TextBox Text="{Binding BatchVehicleType, UpdateSourceTrigger=PropertyChanged}" Width="170"
+                         Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                         Padding="4,2" BorderBrush="#444" BorderThickness="1"
+                         ToolTip="e.g. VEHICLE_TYPE_CAR, VEHICLE_TYPE_TRUCK"/>
+                <Button Command="{Binding ApplyBatchTypeCommand}" Content="Set Type" Width="80" Margin="4,0" Style="{StaticResource CommandButtonStyle}"/>
+            </WrapPanel>
         </Border>
 
         <!-- Left: Vehicle List -->
-        <Border Grid.Row="1" Grid.Column="0" Background="{DynamicResource SecondaryBgBrush}" Margin="5">
+        <Border Grid.Row="2" Grid.Column="0" Background="{DynamicResource SecondaryBgBrush}" Margin="5">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <!-- Search -->
                 <TextBox Grid.Row="0"
                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
                          Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
-                         Padding="8" Margin="5" Height="30"/>
-                <!-- Vehicle List -->
+                         Padding="8" Margin="5" Height="30"
+                         ToolTip="Search vehicles by model or make name"/>
                 <ListBox Grid.Row="1"
                          ItemsSource="{Binding FilteredVehicles}"
                          SelectedItem="{Binding SelectedVehicle}"
@@ -59,12 +100,34 @@
         </Border>
 
         <!-- Right: Vehicle Properties -->
-        <Border Grid.Row="1" Grid.Column="1" Background="{DynamicResource SecondaryBgBrush}" Margin="5" Padding="15">
+        <Border Grid.Row="2" Grid.Column="1" Background="{DynamicResource SecondaryBgBrush}" Margin="5" Padding="12">
             <ScrollViewer>
                 <StackPanel>
-                    <TextBlock Text="Vehicle Properties" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}"/>
+                    <TextBlock Text="Vehicle Properties" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,8"/>
 
+                    <!-- No selection -->
+                    <StackPanel Visibility="{Binding SelectedVehicle, Converter={StaticResource BoolToVisInverseConverter}}">
+                        <TextBlock Text="Select a vehicle to view properties" FontSize="11" Foreground="{DynamicResource GrayTextBrush}"/>
+                        <TextBlock Text="Tip: Drag and drop a vehicles.meta file onto this tab to load it"
+                                   FontSize="10" Foreground="{DynamicResource GrayTextBrush}" Margin="0,6,0,0"/>
+                    </StackPanel>
+
+                    <!-- Vehicle properties -->
                     <StackPanel Visibility="{Binding SelectedVehicle, Converter={StaticResource BoolToVisConverter}}">
+
+                        <!-- Quick Preset -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                            <TextBlock Text="Quick Preset:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <ComboBox ItemsSource="{Binding VehiclePresets}" Width="160"
+                                      Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                      SelectedIndex="0" x:Name="PresetCombo"
+                                      ToolTip="Auto-fills type, class, layout, handling ID and flags"/>
+                            <Button Content="Apply" Width="60" Margin="6,0,0,0" Style="{StaticResource CommandButtonStyle}"
+                                    Command="{Binding ApplyPresetCommand}"
+                                    CommandParameter="{Binding SelectedItem, ElementName=PresetCombo}"/>
+                        </StackPanel>
+
+                        <!-- Core fields -->
                         <Grid Margin="0,0,0,5">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="120"/>
@@ -80,75 +143,113 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
-                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Model:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Model Name:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
                             <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedVehicle.ModelName, UpdateSourceTrigger=PropertyChanged}"
                                      Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
-                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"/>
+                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"
+                                     ToolTip="Spawn name (lowercase, no spaces)"/>
 
                             <TextBlock Grid.Row="1" Grid.Column="0" Text="Make:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SelectedVehicle.VehicleMakeName, UpdateSourceTrigger=PropertyChanged}"
                                      Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
-                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"/>
+                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"
+                                     ToolTip="Manufacturer (VAPID, DECLASSE, ROCKSTAR, etc.)"/>
 
-                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Class:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
-                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding SelectedVehicle.VehicleClass, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Game Name:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding SelectedVehicle.GameName, UpdateSourceTrigger=PropertyChanged}"
                                      Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
-                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"/>
+                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"
+                                     ToolTip="Display name shown in-game"/>
 
-                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Type:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Vehicle Type:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
                             <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding SelectedVehicle.VehicleType, UpdateSourceTrigger=PropertyChanged}"
                                      Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
-                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"/>
+                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"
+                                     ToolTip="VEHICLE_TYPE_CAR / TRUCK / BIKE / HELI / PLANE / BOAT"/>
 
-                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Seats:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
-                            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding SelectedVehicle.Seats, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Vehicle Class:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
+                            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding SelectedVehicle.VehicleClass, UpdateSourceTrigger=PropertyChanged}"
                                      Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
-                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"/>
+                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"
+                                     ToolTip="VC_SEDAN, VC_SPORTS, VC_SUV, VC_EMERGENCY, VC_MOTORCYCLE, VC_HELICOPTER, VC_BOATS"/>
 
                             <TextBlock Grid.Row="5" Grid.Column="0" Text="Handling ID:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
                             <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding SelectedVehicle.HandlingId, UpdateSourceTrigger=PropertyChanged}"
                                      Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
-                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"/>
+                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"
+                                     ToolTip="Must match handlingName in handling.meta"/>
 
-                            <TextBlock Grid.Row="6" Grid.Column="0" Text="Game Name:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
-                            <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding SelectedVehicle.GameName, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBlock Grid.Row="6" Grid.Column="0" Text="Layout:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
+                            <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding SelectedVehicle.Layout, UpdateSourceTrigger=PropertyChanged}"
                                      Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
-                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"/>
+                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"
+                                     ToolTip="LAYOUT_STD_CAR / VAN / TRUCK / BIKE / HELI / BOAT"/>
 
-                            <TextBlock Grid.Row="7" Grid.Column="0" Text="Vehicle Type:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
-                            <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding SelectedVehicle.VehicleType, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBlock Grid.Row="7" Grid.Column="0" Text="Seats:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
+                            <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding SelectedVehicle.Seats, UpdateSourceTrigger=PropertyChanged}"
                                      Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
-                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"/>
+                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"
+                                     ToolTip="Number of seats (1=driver only, 4=standard car)"/>
 
-                            <TextBlock Grid.Row="8" Grid.Column="0" Text="Layout:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
-                            <TextBox Grid.Row="8" Grid.Column="1" Text="{Binding SelectedVehicle.Layout}"
-                                     IsReadOnly="True"
+                            <TextBlock Grid.Row="8" Grid.Column="0" Text="Body Health:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
+                            <TextBox Grid.Row="8" Grid.Column="1" Text="{Binding SelectedVehicle.DefaultBodyHealth, UpdateSourceTrigger=PropertyChanged}"
                                      Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
-                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"/>
+                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"
+                                     ToolTip="Default body health (1000=standard, 5000+=armored)"/>
+
+                            <TextBlock Grid.Row="9" Grid.Column="0" Text="Frequency:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
+                            <TextBox Grid.Row="9" Grid.Column="1" Text="{Binding SelectedVehicle.Frequency, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"
+                                     ToolTip="Traffic spawn frequency (0=rare, 100=very common)"/>
+
+                            <TextBlock Grid.Row="10" Grid.Column="0" Text="Plate Type:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
+                            <TextBox Grid.Row="10" Grid.Column="1" Text="{Binding SelectedVehicle.PlateType, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"
+                                     ToolTip="0=blue/white, 1=yellow rear, 2=yellow front, 3=motorcycle"/>
+
+                            <TextBlock Grid.Row="11" Grid.Column="0" Text="Swankness:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,3"/>
+                            <TextBox Grid.Row="11" Grid.Column="1" Text="{Binding SelectedVehicle.Swankness, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="5,3" BorderThickness="1" BorderBrush="#444" Margin="0,3"
+                                     ToolTip="Prestige level 0-4. Affects NPC reactions."/>
                         </Grid>
 
-                        <Separator Margin="0,10"/>
+                        <Separator Margin="0,8"/>
 
-                        <TextBlock Text="Flags" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,5"/>
-                        <ListBox ItemsSource="{Binding SelectedVehicle.Flags}"
-                                 Background="{DynamicResource DarkBgBrush}"
-                                 Foreground="{DynamicResource LightTextBrush}"
-                                 Height="100"/>
-                    </StackPanel>
-
-                    <StackPanel Visibility="{Binding SelectedVehicle, Converter={StaticResource BoolToVisInverseConverter}}">
-                        <TextBlock Text="Select a vehicle to view properties" FontSize="11" Foreground="{DynamicResource GrayTextBrush}"/>
+                        <!-- Flags Editor with checkboxes -->
+                        <TextBlock Text="Vehicle Flags" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,6"/>
+                        <Border Background="{DynamicResource DarkBgBrush}" CornerRadius="4" Padding="8">
+                            <ItemsControl ItemsSource="{Binding FlagItems}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox Content="{Binding Name}"
+                                                  IsChecked="{Binding IsEnabled, Mode=TwoWay}"
+                                                  Foreground="{DynamicResource LightTextBrush}"
+                                                  Margin="4,3" FontSize="10" MinWidth="220"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Border>
                     </StackPanel>
                 </StackPanel>
             </ScrollViewer>
         </Border>
 
         <!-- Status -->
-        <Border Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Background="{StaticResource TertiaryBgBrush}" Padding="10">
+        <Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Background="{StaticResource TertiaryBgBrush}" Padding="10">
             <TextBlock Text="{Binding StatusMessage}" Foreground="{DynamicResource GrayTextBrush}"/>
         </Border>
     </Grid>
 </UserControl>
-

@@ -10,10 +10,27 @@ namespace FiveMVehicleMetaEditorWPF.Views.Tabs
         public BrowserView()
         {
             InitializeComponent();
-            // Set DataContext immediately so XAML bindings work
             var mainWindow = System.Windows.Application.Current.MainWindow as MainWindow;
             var mainVM = mainWindow?.DataContext as MainWindowViewModel;
-            DataContext = new BrowserViewModel(mainVM);
+            var vm = new BrowserViewModel(mainVM);
+            DataContext = vm;
+
+            // Wire callbacks so "Load + Navigate" actually pushes data into the target tab
+            vm.OnVehiclesFileLoaded = path =>
+            {
+                if (mainWindow?.VehiclesTabView?.DataContext is VehiclesViewModel vehiclesVM)
+                    vehiclesVM.LoadFromPath(path);
+            };
+            vm.OnHandlingFileLoaded = path =>
+            {
+                if (mainWindow?.HandlingTabView?.DataContext is HandlingViewModel handlingVM)
+                    handlingVM.LoadHandlingFile(path);
+            };
+            vm.OnLayoutsFileLoaded = path =>
+            {
+                if (mainWindow?.LayoutsTabView?.DataContext is LayoutsViewModel layoutsVM)
+                    layoutsVM.LoadLayoutsFile(path);
+            };
         }
 
         private void RecentFile_DoubleClick(object sender, MouseButtonEventArgs e)

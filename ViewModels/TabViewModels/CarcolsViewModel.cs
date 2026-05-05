@@ -12,20 +12,25 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
 {
     public class CarcolsViewModel : BaseTabViewModel
     {
+        private readonly BackupManager _backupManager = new(".backups");
         private string _currentFilePath = "";
         private string? _selectedEntry;
         private XDocument? _loadedDoc;
 
-        // List of kit names
         public ObservableCollection<string> CarcolEntries { get; } = new();
 
-        // Detail properties for selected kit
+        // Read-only detail properties
         private string _kitId = "";
         private string _kitType = "";
         private int _visibleModCount = 0;
         private int _statModCount = 0;
         private int _linkModCount = 0;
         public ObservableCollection<string> VisibleMods { get; } = new();
+
+        // Editable kit properties
+        private string _editKitName = "";
+        private string _editKitId = "";
+        private string _editKitType = "";
 
         public string KitId
         {
@@ -53,6 +58,22 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
             set { _linkModCount = value; OnPropertyChanged(); }
         }
 
+        public string EditKitName
+        {
+            get => _editKitName;
+            set { _editKitName = value; OnPropertyChanged(); }
+        }
+        public string EditKitId
+        {
+            get => _editKitId;
+            set { _editKitId = value; OnPropertyChanged(); }
+        }
+        public string EditKitType
+        {
+            get => _editKitType;
+            set { _editKitType = value; OnPropertyChanged(); }
+        }
+
         public string? SelectedEntry
         {
             get => _selectedEntry;
@@ -67,12 +88,20 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
         public new ICommand LoadCommand { get; }
         public new ICommand SaveCommand { get; }
         public new ICommand ExportCommand { get; }
+        public ICommand AddKitCommand { get; }
+        public ICommand DeleteKitCommand { get; }
+        public ICommand RenameKitCommand { get; }
+        public ICommand ApplyKitChangesCommand { get; }
 
         public CarcolsViewModel(MainWindowViewModel? mainVM = null) : base(mainVM)
         {
             LoadCommand = new RelayCommand(ExecuteLoad);
             SaveCommand = new RelayCommand(ExecuteSave);
             ExportCommand = new RelayCommand(ExecuteExport);
+            AddKitCommand = new RelayCommand(ExecuteAddKit);
+            DeleteKitCommand = new RelayCommand(ExecuteDeleteKit, _ => _selectedEntry != null);
+            RenameKitCommand = new RelayCommand(ExecuteRenameKit, _ => _selectedEntry != null);
+            ApplyKitChangesCommand = new RelayCommand(ExecuteApplyKitChanges, _ => _selectedEntry != null);
             ShowInfo("Load a carcols.meta file to edit vehicle color palettes");
         }
 
@@ -81,21 +110,23 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
             VisibleMods.Clear();
             KitId = "";
             KitType = "";
+            EditKitName = "";
+            EditKitId = "";
+            EditKitType = "";
             VisibleModCount = 0;
             StatModCount = 0;
             LinkModCount = 0;
 
             if (kitName == null || _loadedDoc == null) return;
 
-            var kit = _loadedDoc.Root?
-                .Descendants("Kits")
-                .Elements("Item")
-                .FirstOrDefault(i => i.Element("kitName")?.Value == kitName);
-
+            var kit = FindKit(kitName);
             if (kit == null) return;
 
             KitId = kit.Element("id")?.Attribute("value")?.Value ?? "";
             KitType = kit.Element("kitType")?.Value ?? "";
+            EditKitName = kitName;
+            EditKitId = KitId;
+            EditKitType = KitType;
 
             var visible = kit.Element("visibleMods")?.Elements("Item").ToList() ?? new();
             VisibleModCount = visible.Count;
@@ -109,6 +140,123 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
 
             StatModCount = kit.Element("statMods")?.Elements("Item").Count() ?? 0;
             LinkModCount = kit.Element("linkMods")?.Elements("Item").Count() ?? 0;
+        }
+
+        private XElement? FindKit(string kitName)
+        {
+            return _loadedDoc?.Root?
+                .Descendants("Kits")
+                .Elements("Item")
+                .FirstOrDefault(i => i.Element("kitName")?.Value == kitName);
+        }
+
+        private int GetNextKitId()
+        {
+            if (_loadedDoc == null) return 1;
+            var ids = _loadedDoc.Root?
+                .Descendants("Kits").Elements("Item")
+                .Select(i => int.TryParse(i.Element("id")?.Attribute("value")?.Value, out var id) ? id : 0)
+                .ToList() ?? new();
+            return (ids.Count > 0 ? ids.Max() : 0) + 1;
+        }
+
+        private void ExecuteAddKit()
+        {
+            if (_loadedDoc == null) { ShowError("No file loaded"); return; }
+
+            var newId = GetNextKitId();
+            var newName = $"kit_{newId:D3}";
+
+            var kitsElem = _loadedDoc.Root?.Descendants("Kits").FirstOrDefault();
+            if (kitsElem == null)
+            {
+                // Create Kits element
+                _loadedDoc.Root?.Add(new XElement("Kits"));
+                kitsElem = _loadedDoc.Root?.Element("Kits");
+            }
+
+            var newKit = new XElement("Item",
+                new XElement("kitName", newName),
+                new XElement("id", new XAttribute("value", newId)),
+                new XElement("kitType", "KIT_TYPE_STANDARD"),
+                new XElement("visibleMods"),
+                new XElement("statMods"),
+                new XElement("linkMods")
+            );
+
+            kitsElem?.Add(newKit);
+            CarcolEntries.Add(newName);
+            SelectedEntry = newName;
+            ShowSuccess($"Added kit '{newName}' (ID {newId})");
+        }
+
+        private void ExecuteDeleteKit()
+        {
+            if (_selectedEntry == null || _loadedDoc == null) return;
+
+            var kit = FindKit(_selectedEntry);
+            if (kit == null) return;
+
+            var name = _selectedEntry;
+            kit.Remove();
+            CarcolEntries.Remove(name);
+            SelectedEntry = null;
+            ShowSuccess($"Deleted kit '{name}'");
+        }
+
+        private void ExecuteRenameKit()
+        {
+            if (_selectedEntry == null || _loadedDoc == null) return;
+            if (string.IsNullOrWhiteSpace(EditKitName)) { ShowError("Kit name cannot be empty"); return; }
+
+            var kit = FindKit(_selectedEntry);
+            if (kit == null) return;
+
+            var oldName = _selectedEntry;
+            var newName = EditKitName.Trim();
+
+            kit.Element("kitName")!.Value = newName;
+
+            var idx = CarcolEntries.IndexOf(oldName);
+            if (idx >= 0) CarcolEntries[idx] = newName;
+
+            SelectedEntry = newName;
+            ShowSuccess($"Renamed '{oldName}' → '{newName}'");
+        }
+
+        private void ExecuteApplyKitChanges()
+        {
+            if (_selectedEntry == null || _loadedDoc == null) return;
+
+            var kit = FindKit(_selectedEntry);
+            if (kit == null) return;
+
+            // Apply ID change
+            if (!string.IsNullOrWhiteSpace(EditKitId))
+            {
+                var idElem = kit.Element("id");
+                if (idElem == null) kit.Add(new XElement("id", new XAttribute("value", EditKitId)));
+                else idElem.SetAttributeValue("value", EditKitId);
+                KitId = EditKitId;
+            }
+
+            // Apply type change
+            if (!string.IsNullOrWhiteSpace(EditKitType))
+            {
+                var typeElem = kit.Element("kitType");
+                if (typeElem == null) kit.Add(new XElement("kitType", EditKitType));
+                else typeElem.Value = EditKitType;
+                KitType = EditKitType;
+            }
+
+            // Apply name change
+            if (!string.IsNullOrWhiteSpace(EditKitName) && EditKitName != _selectedEntry)
+            {
+                ExecuteRenameKit();
+                return;
+            }
+
+            ShowSuccess("Kit changes applied");
         }
 
         private void ExecuteLoad()
@@ -155,6 +303,10 @@ namespace FiveMVehicleMetaEditorWPF.ViewModels.TabViewModels
                 var filePath = string.IsNullOrEmpty(_currentFilePath)
                     ? FileService.SaveFileDialog("carcols", "carcols.meta") : _currentFilePath;
                 if (filePath == null) return;
+
+                if (File.Exists(filePath))
+                    _backupManager.CreateBackup(filePath);
+
                 IsLoading = true;
                 _loadedDoc.Save(filePath);
                 _currentFilePath = filePath;

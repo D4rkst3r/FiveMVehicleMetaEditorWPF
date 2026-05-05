@@ -12,89 +12,233 @@
         </Grid.RowDefinitions>
 
         <!-- Toolbar -->
-        <Border Grid.Row="0" Background="{DynamicResource SecondaryBgBrush}" Padding="10">
-            <StackPanel Orientation="Horizontal">
-                <Button Command="{Binding GenerateCommand}" Content="⚙️ Generate" Width="110" Style="{StaticResource CommandButtonStyle}"/>
-                <Button Command="{Binding ResetCommand}" Content="🔄 Reset" Width="80" Style="{StaticResource CommandButtonStyle}"/>
-            </StackPanel>
+        <Border Grid.Row="0" Background="{DynamicResource SecondaryBgBrush}" Padding="10,8">
+            <WrapPanel Orientation="Horizontal">
+                <Button Command="{Binding GenerateCommand}" Content="Generate" Width="100" Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Generate all checked output files"/>
+                <Button Command="{Binding ResetCommand}" Content="Reset" Width="70" Style="{StaticResource CommandButtonStyle}"
+                        ToolTip="Clear all fields back to defaults" Margin="6,0,0,0"/>
+                <Separator Width="8"/>
+                <!-- Quick Preset -->
+                <TextBlock Text="Preset:" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                <ComboBox ItemsSource="{Binding VehiclePresets}" Width="130" SelectedIndex="0" x:Name="PresetBox"
+                          Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                          ToolTip="Auto-fill fields for a vehicle type"/>
+                <Button Content="Apply" Width="55" Margin="5,0,0,0" Style="{StaticResource CommandButtonStyle}"
+                        Command="{Binding ApplyPresetCommand}"
+                        CommandParameter="{Binding SelectedItem, ElementName=PresetBox}"/>
+            </WrapPanel>
         </Border>
 
-        <!-- Content -->
+        <!-- Main Form -->
         <ScrollViewer Grid.Row="1">
-            <StackPanel Margin="20">
-                <TextBlock Text="🔧 Vehicle Generator" FontSize="20" FontWeight="Bold"
-                           Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,5"/>
-                <TextBlock Text="Create a new vehicles.meta entry from scratch"
-                           Foreground="{DynamicResource GrayTextBrush}" Margin="0,0,0,20"/>
+            <StackPanel Margin="16">
 
-                <Border Background="{DynamicResource SecondaryBgBrush}" Padding="20" CornerRadius="4" Margin="0,0,0,15">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="150"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
+                <!-- Identity section -->
+                <Border Background="{DynamicResource SecondaryBgBrush}" Padding="16" CornerRadius="4" Margin="0,0,0,10">
+                    <StackPanel>
+                        <TextBlock Text="Identity" FontSize="12" FontWeight="Bold"
+                                   Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,10"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="140"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="140"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
 
-                        <TextBlock Grid.Row="0" Text="Required Fields" Grid.ColumnSpan="2"
-                                   FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,10"/>
-
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Model Name: *"
-                                   Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,0,8"/>
-                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ModelName, UpdateSourceTrigger=PropertyChanged}"
-                                 Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
-                                 Padding="8,5" Margin="0,0,0,8"/>
-
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Handling ID: *"
-                                   Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,0,8"/>
-                        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding HandlingId, UpdateSourceTrigger=PropertyChanged}"
-                                 Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
-                                 Padding="8,5" Margin="0,0,0,8"/>
-
-                        <TextBlock Grid.Row="3" Text="Optional Fields" Grid.ColumnSpan="2"
-                                   FontSize="12" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}" Margin="0,10,0,10"/>
-
-                        <TextBlock Grid.Row="4" Grid.Column="0" Text="TXD Name:"
-                                   Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,0,8"/>
-                        <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding TxdName, UpdateSourceTrigger=PropertyChanged}"
-                                 Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
-                                 Padding="8,5" Margin="0,0,0,8"/>
-
-                        <TextBlock Grid.Row="5" Grid.Column="0" Text="Game Name:"
-                                   Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,0,8"/>
-                        <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding GameName, UpdateSourceTrigger=PropertyChanged}"
-                                 Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
-                                 Padding="8,5" Margin="0,0,0,8"/>
-
-                        <TextBlock Grid.Row="6" Grid.Column="0" Text="Make Name:"
-                                   Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,0,8"/>
-                        <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding VehicleMakeName, UpdateSourceTrigger=PropertyChanged}"
-                                 Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
-                                 Padding="8,5" Margin="0,0,0,8"/>
-
-                        <TextBlock Grid.Row="7" Grid.Column="0" Text="Vehicle Class:"
-                                   Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,0,8"/>
-                        <StackPanel Grid.Row="7" Grid.Column="1" Margin="0,0,0,8">
-                            <TextBox Text="{Binding VehicleClass, UpdateSourceTrigger=PropertyChanged}"
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Model Name *" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,0,6"/>
+                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ModelName, UpdateSourceTrigger=PropertyChanged}"
                                      Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
-                                     Padding="8,5"/>
-                            <TextBlock Text="Examples: VC_SEDAN, VC_SUV, VC_SPORTS, VC_SUPER, VC_MUSCLE, VC_TRUCK, VC_MOTORCYCLE, VC_MILITARY, VC_EMERGENCY"
-                                       TextWrapping="Wrap"
-                                       Foreground="{DynamicResource GrayTextBrush}" FontSize="10" Margin="0,3,0,0"/>
-                        </StackPanel>
-                    </Grid>
+                                     Padding="6,4" Margin="0,0,12,6"
+                                     ToolTip="Spawn name: lowercase, no spaces (e.g. sultan, police3)"/>
+
+                            <TextBlock Grid.Row="0" Grid.Column="2" Text="Game Name" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,0,6"/>
+                            <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding GameName, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="6,4" Margin="0,0,0,6"
+                                     ToolTip="Display name shown in-game (defaults to MODEL NAME if empty)"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="TXD Name" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,0,6"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding TxdName, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="6,4" Margin="0,0,12,6"
+                                     ToolTip="Texture dictionary name (defaults to Model Name if empty)"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="2" Text="Make Name" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,0,6"/>
+                            <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding VehicleMakeName, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="6,4" Margin="0,0,0,6"
+                                     ToolTip="Manufacturer (VAPID, ROCKSTAR, DECLASSE, etc.)"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Handling ID *" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,0,6"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding HandlingId, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="6,4" Margin="0,0,12,6"
+                                     ToolTip="Must match a handlingName in handling.meta (e.g. SPORTSCAR, POLICE)"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="2" Text="Audio Hash" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,0,6"/>
+                            <TextBox Grid.Row="2" Grid.Column="3" Text="{Binding AudioNameHash, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="6,4" Margin="0,0,0,6"
+                                     ToolTip="Audio hash name (leave empty for default)"/>
+                        </Grid>
+                    </StackPanel>
                 </Border>
 
-                <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource GrayTextBrush}" FontSize="10"
-                           Text="* Required fields. TXD Name defaults to Model Name if empty. Click Generate to save the vehicles.meta file."/>
+                <!-- Classification section -->
+                <Border Background="{DynamicResource SecondaryBgBrush}" Padding="16" CornerRadius="4" Margin="0,0,0,10">
+                    <StackPanel>
+                        <TextBlock Text="Classification" FontSize="12" FontWeight="Bold"
+                                   Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,10"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="140"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="140"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Vehicle Type" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,0,6"/>
+                            <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding VehicleTypes}"
+                                      SelectedValue="{Binding VehicleType}"
+                                      Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                      Margin="0,0,12,6"
+                                      ToolTip="Determines physics engine and behavior"/>
+
+                            <TextBlock Grid.Row="0" Grid.Column="2" Text="Vehicle Class" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,0,6"/>
+                            <ComboBox Grid.Row="0" Grid.Column="3" ItemsSource="{Binding VehicleClasses}"
+                                      SelectedValue="{Binding VehicleClass}"
+                                      Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                      Margin="0,0,0,6"
+                                      ToolTip="GTA vehicle class — affects stat comparisons and traffic"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Layout" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,0,6"/>
+                            <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Layouts}"
+                                      SelectedValue="{Binding Layout}"
+                                      Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                      Margin="0,0,12,6"
+                                      ToolTip="Seat/door layout template from vehiclelayouts.meta"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Physical properties -->
+                <Border Background="{DynamicResource SecondaryBgBrush}" Padding="16" CornerRadius="4" Margin="0,0,0,10">
+                    <StackPanel>
+                        <TextBlock Text="Physical Properties" FontSize="12" FontWeight="Bold"
+                                   Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,10"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="140"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="140"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Seats" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,0,6"/>
+                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding Seats, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="6,4" Margin="0,0,12,6"
+                                     ToolTip="Number of seats (1=driver only, 2=2-seater, 4=standard)"/>
+
+                            <TextBlock Grid.Row="0" Grid.Column="2" Text="Body Health" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,0,6"/>
+                            <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding DefaultBodyHealth, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="6,4" Margin="0,0,0,6"
+                                     ToolTip="Default body health (1000=standard, 2000=tough, 5000+=armored)"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Frequency" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,0,6"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Frequency, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="6,4" Margin="0,0,12,6"
+                                     ToolTip="Traffic spawn frequency (0=rare, 100=very common)"/>
+
+                            <TextBlock Grid.Row="1" Grid.Column="2" Text="Max Spawns" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,0,6"/>
+                            <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding MaxNum, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="6,4" Margin="0,0,0,6"
+                                     ToolTip="Max number of this vehicle that can exist in the world simultaneously"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Plate Type" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,0,6"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding PlateType, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="6,4" Margin="0,0,12,6"
+                                     ToolTip="0=blue/white, 1=yellow rear, 2=yellow front, 3=motorcycle"/>
+
+                            <TextBlock Grid.Row="2" Grid.Column="2" Text="Swankness" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,0,6"/>
+                            <TextBox Grid.Row="2" Grid.Column="3" Text="{Binding Swankness, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="6,4" Margin="0,0,0,6"
+                                     ToolTip="Prestige level 0-4 — affects NPC reactions"/>
+
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Wheel Scale" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,0,6"/>
+                            <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding WheelScale, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="6,4" Margin="0,0,12,6"
+                                     ToolTip="Front wheel radius multiplier (default 0.268)"/>
+
+                            <TextBlock Grid.Row="3" Grid.Column="2" Text="Wheel Scale Rear" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,0,6"/>
+                            <TextBox Grid.Row="3" Grid.Column="3" Text="{Binding WheelScaleRear, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="6,4" Margin="0,0,0,6"
+                                     ToolTip="Rear wheel radius multiplier"/>
+
+                            <TextBlock Grid.Row="4" Grid.Column="0" Text="Driveable Doors" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,0,6"/>
+                            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding DriveableDoors, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="6,4" Margin="0,0,12,6"
+                                     ToolTip="0=none open, 1=driver only, 3=all doors open"/>
+
+                            <TextBlock Grid.Row="4" Grid.Column="2" Text="Weapon Force" Foreground="{DynamicResource LightTextBrush}" VerticalAlignment="Center" Margin="0,0,0,6"/>
+                            <TextBox Grid.Row="4" Grid.Column="3" Text="{Binding WeaponForceMult, UpdateSourceTrigger=PropertyChanged}"
+                                     Background="{DynamicResource DarkBgBrush}" Foreground="{DynamicResource LightTextBrush}"
+                                     Padding="6,4" Margin="0,0,0,6"
+                                     ToolTip="Weapon force multiplier (1.0=normal, 0=immune to weapons)"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <!-- Output Options -->
+                <Border Background="{DynamicResource SecondaryBgBrush}" Padding="16" CornerRadius="4" Margin="0,0,0,10">
+                    <StackPanel>
+                        <TextBlock Text="Output Files" FontSize="12" FontWeight="Bold"
+                                   Foreground="{DynamicResource PrimaryBrush}" Margin="0,0,0,10"/>
+                        <CheckBox Content="vehicles.meta  (always generated)" IsChecked="True" IsEnabled="False"
+                                  Foreground="{DynamicResource LightTextBrush}" Margin="0,3"/>
+                        <CheckBox Content="handling.meta stub  (realistic defaults, edit in Handling tab)"
+                                  IsChecked="{Binding GenerateHandling}"
+                                  Foreground="{DynamicResource LightTextBrush}" Margin="0,3"
+                                  ToolTip="Creates a ready-to-edit handling.meta with sensible default values"/>
+                        <CheckBox Content="carcols.meta stub  (empty modkit template)"
+                                  IsChecked="{Binding GenerateCarcols}"
+                                  Foreground="{DynamicResource LightTextBrush}" Margin="0,3"
+                                  ToolTip="Creates a carcols.meta with one empty modkit entry"/>
+                        <CheckBox Content="fxmanifest.lua  (FiveM resource manifest)"
+                                  IsChecked="{Binding GenerateFxManifest}"
+                                  Foreground="{DynamicResource LightTextBrush}" Margin="0,3"
+                                  ToolTip="Creates a complete fxmanifest.lua referencing all generated files"/>
+                        <TextBlock Text="* Required fields: Model Name, Handling ID"
+                                   FontSize="10" Foreground="{DynamicResource GrayTextBrush}" Margin="0,8,0,0"/>
+                    </StackPanel>
+                </Border>
+
             </StackPanel>
         </ScrollViewer>
 

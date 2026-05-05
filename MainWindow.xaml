@@ -114,6 +114,9 @@
                     <Button Click="TabButton_Click" Tag="carvariations" Height="55" Margin="0" HorizontalContentAlignment="Left" Style="{StaticResource SidebarButtonStyle}">
                         <TextBlock Text="🎨 Variations" FontSize="12" Foreground="{DynamicResource LightTextBrush}"/>
                     </Button>
+                    <Button Click="TabButton_Click" Tag="diff" Height="55" Margin="0" HorizontalContentAlignment="Left" Style="{StaticResource SidebarButtonStyle}">
+                        <TextBlock Text="⇄ Diff Tool" FontSize="12" Foreground="{DynamicResource LightTextBrush}"/>
+                    </Button>
                     <Button Click="TabButton_Click" Tag="settings" Height="55" Margin="0" HorizontalContentAlignment="Left" Style="{StaticResource SidebarButtonStyle}">
                         <TextBlock Text="⚙️ Settings" FontSize="12" Foreground="{DynamicResource LightTextBrush}"/>
                     </Button>
@@ -143,6 +146,7 @@
                 <views:CarcolsView x:Name="CarcolsTabView" Visibility="{Binding DataContext.CurrentTab, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=carcols}"/>
                 <views:LayoutsView x:Name="LayoutsTabView" Visibility="{Binding DataContext.CurrentTab, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=layouts}"/>
                 <views:CarvariationsView x:Name="CarvariationsTabView" Visibility="{Binding DataContext.CurrentTab, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=carvariations}"/>
+                <views:DiffView x:Name="DiffTabView" Visibility="{Binding DataContext.CurrentTab, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=diff}"/>
                 <views:SettingsView x:Name="SettingsTabView" Visibility="{Binding DataContext.CurrentTab, RelativeSource={RelativeSource FindAncestor, AncestorType=Window}, Converter={StaticResource StringToVisibilityConverter}, ConverterParameter=settings}"/>
             </Grid>
         </Border>
